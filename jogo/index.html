@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Trabalho em Altura — Aula e Prova</title>
+<link rel="stylesheet" href="css/jogo.css">
+</head>
+<body>
+
+<div id="cena"></div>
+
+<!-- ------------------------------------------------------------------ carregando -->
+<div id="carregando" class="tela">
+  <div class="carga">
+    <p class="eyebrow">Canteiro de obras</p>
+    <h1>Trabalho em Altura</h1>
+    <div class="barra"><div id="barra-int"></div></div>
+    <p id="carga-txt" class="carga-txt">carregando o canteiro…</p>
+  </div>
+</div>
+
+<!-- ------------------------------------------------------------------ abertura -->
+<div id="tela-abertura" class="tela" hidden>
+  <div class="painel">
+    <p class="eyebrow">Treinamento interativo</p>
+    <h1>Trabalho em Altura</h1>
+    <p class="lead">Primeiro a aula. Depois você entra no canteiro e a prova é a sua própria jornada de
+      trabalho: observar, decidir e viver a consequência de cada escolha.</p>
+    <form id="form-nome" class="form-nome" autocomplete="off">
+      <label for="campo-nome">Seu nome</label>
+      <input id="campo-nome" name="nome" type="text" maxlength="24" placeholder="Como o instrutor vai te chamar" required>
+      <button id="btn-comecar" type="submit" class="botao primario">Começar a aula</button>
+    </form>
+    <p class="rodape-nota">Fone de ouvido recomendado. Arraste o mouse para olhar em volta durante a prova.</p>
+  </div>
+</div>
+
+<!-- ------------------------------------------------------------------ aula -->
+<div id="tela-aula" class="tela escura" hidden>
+  <div class="aula">
+    <header class="aula-cab">
+      <span class="etapa">Aula <span id="aula-n">1</span>/<span id="aula-total">1</span></span>
+      <h2 id="aula-titulo">—</h2>
+      <button id="aula-sair" class="botao fantasma" type="button" hidden>Ir para a prova</button>
+    </header>
+    <div class="aula-corpo">
+      <div class="aula-vis">
+        <video id="aula-video" playsinline controls hidden></video>
+        <img id="aula-img" alt="" hidden>
+      </div>
+      <div class="aula-txt">
+        <ul id="aula-pontos"></ul>
+      </div>
+    </div>
+    <footer class="aula-pe">
+      <div class="aula-passos" id="aula-passos"></div>
+      <div class="aula-bts">
+        <button id="aula-voltar" class="botao" type="button">Voltar</button>
+        <button id="aula-avancar" class="botao primario" type="button">Avançar</button>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<!-- ------------------------------------------------------------------ HUD da prova -->
+<div id="hud" hidden>
+  <div id="faixa-cima" class="faixa"></div>
+  <div id="faixa-baixo" class="faixa"></div>
+
+  <div id="marca-modo" class="marca-modo" hidden>
+    <span class="pt3">3ª pessoa</span><span id="marca-txt">consequência da sua escolha</span>
+  </div>
+  <div id="marca-congelado" class="marca-congelado" hidden>congelado</div>
+
+  <div id="hud-topo">
+    <div id="hud-cena" class="hud-cena"><span id="hud-cena-id">—</span><span id="hud-cena-nome"></span></div>
+    <div id="hud-som" class="hud-som" hidden></div>
+  </div>
+
+  <div id="toasts"></div>
+
+  <div id="tela-jogo" class="tela-jogo" hidden></div>
+
+  <div id="rodape">
+    <div id="fala" class="fala" hidden>
+      <span id="fala-quem" class="fala-quem">IA</span>
+      <p id="fala-texto"></p>
+      <span class="fala-dica">clique para continuar</span>
+    </div>
+    <div id="escolhas" class="escolhas" hidden></div>
+    <div id="etapas" class="etapas" hidden></div>
+  </div>
+</div>
+
+<!-- ------------------------------------------------------------------ resultado -->
+<div id="tela-resultado" class="tela escura" hidden>
+  <div class="resultado">
+    <p class="eyebrow">Resultado da prova</p>
+    <h1 id="res-titulo">—</h1>
+    <p id="res-nome" class="lead"></p>
+    <div id="res-ia" class="res-ia"></div>
+    <h3 class="sub-h">Relatório</h3>
+    <div id="res-cats" class="res-cats"></div>
+    <div class="res-bts">
+      <button id="res-revisar" class="botao" type="button">Ver minhas decisões</button>
+      <button id="res-criticas" class="botao alerta" type="button" hidden>Refazer situações críticas</button>
+      <button id="res-refazer" class="botao primario" type="button">Refazer a prova</button>
+    </div>
+  </div>
+</div>
+
+<!-- ------------------------------------------------------------------ revisao -->
+<div id="tela-revisao" class="tela escura" hidden>
+  <div class="revisao">
+    <header class="rev-cab">
+      <h2>Minhas decisões</h2>
+      <button id="rev-voltar" class="botao" type="button">Voltar ao resultado</button>
+    </header>
+    <div id="rev-lista" class="rev-lista"></div>
+  </div>
+</div>
+
+<script src="vendor/three.min.js"></script>
+<script src="vendor/GLTFLoader.js"></script>
+<script src="vendor/DRACOLoader.js"></script>
+<script src="js/dados.js"></script>
+<script src="js/animacao.js"></script>
+<script src="js/cena3d.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/aula.js"></script>
+<script src="js/motor.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

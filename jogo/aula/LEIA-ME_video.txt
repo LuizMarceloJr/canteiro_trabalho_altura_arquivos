@@ -1,0 +1,13 @@
+COLOQUE AQUI O VIDEO DA AULA
+===========================
+
+Salve o video desta pasta com o nome exato:  aula.mp4
+
+Quando o arquivo existir, o jogo toca o video como aula e so libera o botao
+INICIAR A PROVA quando ele terminar.
+
+Se o arquivo nao existir, o jogo usa a aula em slides ja montada (17 telas com
+os quadros renderizados do proprio canteiro). Voce pode usar essa aula em slides
+como roteiro para gravar o video.
+
+Formato recomendado: MP4 (H.264 + AAC), 1280x720 ou 1920x1080.

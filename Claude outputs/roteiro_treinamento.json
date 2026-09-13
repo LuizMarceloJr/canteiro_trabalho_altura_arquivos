@@ -1,0 +1,3742 @@
+{
+ "versao": "1.0",
+ "titulo": "Treinamento Interativo - Trabalho em Altura",
+ "cenario_principal": "Canteiro de obras",
+ "arquivo_3d": {
+  "glb": "canteiro_trabalho_altura.glb",
+  "glb_comprimido": "canteiro_trabalho_altura_draco.glb",
+  "raiz_treinamento": "TREINAMENTO_TRABALHO_ALTURA",
+  "unidades": "metros",
+  "eixo_cima": "Y (glTF)",
+  "origem": "portão de pedestres do canteiro"
+ },
+ "camera": {
+  "padrao": "1a pessoa (CAM_1P_*)",
+  "terceira_pessoa": "somente para mostrar a consequência de uma escolha (CAM_3P_*) e na Cena 07",
+  "lente_1p_mm": 20.0,
+  "sensor_mm": 36.0,
+  "fov_horizontal_graus": 84.0,
+  "altura_olhos_m": 1.62,
+  "altura_olhos_ajoelhado_m": 1.0,
+  "maos_1p": "objetos MAOS_1P_* parentados na camera correspondente (espaço local da camera)",
+  "retorno": "toda cena 3P termina voltando para a 1a pessoa"
+ },
+ "visibilidade": {
+  "propriedade": "userData.visivel_inicial",
+  "estado_inicial": "percorrer todos os objetos com visivel_inicial e aplicar o valor",
+  "durante_o_roteiro": "aplicar as listas 'mostrar' e 'ocultar' de cada cena/escolha/consequência",
+  "observacao": "objetos com visivel_inicial=false estão no .glb, apenas desligados"
+ },
+ "linguagem": {
+  "principio": "linguagem simples; termo técnico só quando faz parte do trabalho, explicado na primeira vez",
+  "glossario": [
+   [
+    "ANÁLISE DE RISCO",
+    "É a avaliação feita antes do serviço para identificar o que pode dar errado e como trabalhar com segurança."
+   ],
+   [
+    "PERMISSÃO DE TRABALHO",
+    "É a liberação utilizada para determinadas atividades antes do início do serviço."
+   ],
+   [
+    "PONTO DE ANCORAGEM",
+    "É um ponto previsto para fazer parte do sistema de proteção contra quedas."
+   ]
+  ],
+  "uso_do_nome": {
+   "variavel": "{{NOME}}",
+   "usar_em": [
+    "começo de uma nova etapa",
+    "antes de uma decisão importante",
+    "depois de um erro",
+    "durante uma consequência",
+    "em uma emergência",
+    "no resultado final"
+   ],
+   "evitar": "repetir o nome em todas as frases"
+  },
+  "falas_naturais": [
+   "O, {{NOME}}, da licença aqui que eu preciso passar.",
+   "É rapidinho.",
+   "Só falta um.",
+   "Eu sempre faco desse jeito.",
+   "Depois a gente arruma.",
+   "Segura aí para mim."
+  ],
+  "a_ia_nunca_deve": [
+   "ridicularizar trabalhadores",
+   "tratar acidente como piada",
+   "humilhar quem errou",
+   "falar como personagem de desenho",
+   "exagerar sotaques",
+   "estereotipar o trabalhador da construção"
+  ],
+  "pensamentos_a_combater": [
+   "É rapidinho.",
+   "Nunca aconteceu nada.",
+   "Eu sempre fiz assim.",
+   "Só falta um.",
+   "Isso aguenta.",
+   "Depois a gente arruma.",
+   "Não e problema meu.",
+   "Eu seguro bem.",
+   "É só passar por baixo.",
+   "Não precisa parar por causa disso."
+  ]
+ },
+ "variaveis": [
+  {
+   "nome": "TRABALHADOR_AUTORIZADO",
+   "valores": [
+    "SIM",
+    "NAO"
+   ],
+   "definida_em": "C02"
+  },
+  {
+   "nome": "DOCUMENTACAO_VERIFICADA",
+   "valores": [
+    "SIM",
+    "NAO"
+   ],
+   "definida_em": "C04"
+  },
+  {
+   "nome": "ACESSO_CORRETO",
+   "valores": [
+    "SIM",
+    "NAO"
+   ],
+   "definida_em": "C09"
+  },
+  {
+   "nome": "ABERTURA_IGNORADA",
+   "valores": [
+    "SIM",
+    "NAO"
+   ],
+   "definida_em": "C11"
+  },
+  {
+   "nome": "CAPACETE_DANIFICADO",
+   "valores": [
+    "SIM",
+    "NAO"
+   ],
+   "definida_em": "C06a"
+  },
+  {
+   "nome": "CINTURAO_DANIFICADO",
+   "valores": [
+    "SIM",
+    "NAO"
+   ],
+   "definida_em": "C06b"
+  },
+  {
+   "nome": "TALABARTE_DANIFICADO",
+   "valores": [
+    "SIM",
+    "NAO"
+   ],
+   "definida_em": "C06c"
+  },
+  {
+   "nome": "CINTURAO_AJUSTADO",
+   "valores": [
+    "SIM",
+    "NAO"
+   ],
+   "definida_em": "C07"
+  },
+  {
+   "nome": "GUARDA_CORPO_PROBLEMA",
+   "valores": [
+    "SIM",
+    "NAO"
+   ],
+   "definida_em": "C13"
+  },
+  {
+   "nome": "AREA_INFERIOR_ISOLADA",
+   "valores": [
+    "SIM",
+    "NAO"
+   ],
+   "definida_em": "C14"
+  },
+  {
+   "nome": "MATERIAL_SOLTO",
+   "valores": [
+    "SIM",
+    "NAO"
+   ],
+   "definida_em": "C15"
+  },
+  {
+   "nome": "INTERFERENCIA_EQUIPE",
+   "valores": [
+    "SIM",
+    "NAO"
+   ],
+   "definida_em": "C16/EV04"
+  },
+  {
+   "nome": "CONEXAO_INCORRETA",
+   "valores": [
+    "SIM",
+    "NAO"
+   ],
+   "definida_em": "C18"
+  },
+  {
+   "nome": "FERRAMENTAS_PROTEGIDAS",
+   "valores": [
+    "SIM",
+    "NAO"
+   ],
+   "definida_em": "C20"
+  },
+  {
+   "nome": "COMUNICACAO_FUNCIONANDO",
+   "valores": [
+    "SIM",
+    "NAO"
+   ],
+   "definida_em": "EV05"
+  },
+  {
+   "nome": "CONDICAO_AMBIENTAL_SEGURA",
+   "valores": [
+    "SIM",
+    "NAO"
+   ],
+   "definida_em": "C17/EV06/EV16"
+  },
+  {
+   "nome": "PROCEDIMENTO_EMERGENCIA_CORRETO",
+   "valores": [
+    "SIM",
+    "NAO"
+   ],
+   "definida_em": "EV17/EMERG"
+  }
+ ],
+ "variavel_extra": [
+  {
+   "nome": "PONTO_ESCOLHIDO",
+   "valores": [
+    "PA_04_01",
+    "GUARDA_CORPO",
+    "VERGALHAO",
+    "TUBULACAO",
+    "ESTRUTURA_METALICA"
+   ],
+   "definida_em": "C18"
+  }
+ ],
+ "cenas": [
+  {
+   "id": "C01",
+   "titulo": "Entrada no canteiro",
+   "modo": "1P",
+   "camera": "CAM_1P_C01_Entrada_Canteiro",
+   "ambiente": "pessoas circulando, caminhão descarregando ao fundo, som de obra; a camera olha para o 4o pavimento",
+   "ia": [
+    "Olá, {{NOME}}.",
+    "Hoje você realizará uma atividade no quarto pavimento desta obra.",
+    "Seu serviço será ajustar e fixar um suporte próximo à borda da laje.",
+    "Mas existe uma diferença neste treinamento.",
+    "Eu não vou simplesmente dizer tudo o que você precisa fazer.",
+    "Você deverá observar o ambiente e tomar decisões.",
+    "Algumas escolhas terão consequência imediatamente.",
+    "Outras poderão mostrar seus efeitos somente depois.",
+    "E algumas situações poderão acontecer quando você menos esperar.",
+    "Não tenha pressa.",
+    "Seu objetivo não e apenas terminar o serviço.",
+    "Seu objetivo e terminar com segurança."
+   ],
+   "tela": {
+    "titulo": "MISSÃO",
+    "linhas": [
+     "AJUSTAR E FIXAR O SUPORTE NO QUARTO PAVIMENTO."
+    ],
+    "botoes": [
+     "INICIAR"
+    ]
+   },
+   "proxima": "C02"
+  },
+  {
+   "id": "C02",
+   "titulo": "Estou liberado para realizar o serviço?",
+   "modo": "1P",
+   "camera": "CAM_1P_C02_Encarregado",
+   "mostrar": [
+    "NPC_C02_Encarregado_Conversando"
+   ],
+   "falas": [
+    {
+     "quem": "ENCARREGADO",
+     "texto": "Bom dia, {{NOME}}."
+    },
+    {
+     "quem": "ENCARREGADO",
+     "texto": "Precisamos terminar aquele suporte."
+    },
+    {
+     "quem": "ENCARREGADO",
+     "texto": "O pessoal da próxima etapa já esta esperando."
+    }
+   ],
+   "ia": [
+    "{{NOME}}, antes de subir, confirme se você está liberado para realizar esse trabalho."
+   ],
+   "escolhas": [
+    {
+     "id": "A",
+     "texto": "VERIFICAR MINHA LIBERAÇÃO.",
+     "correta": true,
+     "define": {
+      "TRABALHADOR_AUTORIZADO": "SIM"
+     },
+     "ia": [
+      "Correto.",
+      "Experiência ajuda, mas não substitui a liberação necessária para realizar o trabalho.",
+      "Você esta autorizado."
+     ],
+     "tela": {
+      "titulo": "LIBERAÇÃO",
+      "linhas": [
+       "TREINAMENTO - OK",
+       "APTIDÃO - OK",
+       "AUTORIZAÇÃO - OK"
+      ]
+     },
+     "registro": {
+      "categoria": "AUTORIZACAO",
+      "resultado": "CORRETO"
+     }
+    },
+    {
+     "id": "B",
+     "texto": "JÁ TRABALHO EM OBRA HÁ MUITO TEMPO. POSSO SUBIR.",
+     "correta": false,
+     "ia": [
+      "Cuidado, {{NOME}}.",
+      "Ter experiência não significa estar automaticamente liberado para qualquer trabalho em altura.",
+      "Confirme sua liberação antes de continuar."
+     ],
+     "retornar": true,
+     "registro": {
+      "categoria": "AUTORIZACAO",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    },
+    {
+     "id": "C",
+     "texto": "MEU COLEGA ESTA LIBERADO. POSSO IR COM ELE.",
+     "correta": false,
+     "ia": [
+      "A autorização do seu colega não vale para você.",
+      "Cada trabalhador precisa estar liberado para a atividade que vai realizar."
+     ],
+     "retornar": true,
+     "registro": {
+      "categoria": "AUTORIZACAO",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    }
+   ],
+   "proxima": "C03"
+  },
+  {
+   "id": "C03",
+   "titulo": "Precisa mesmo existir exposição a altura?",
+   "modo": "1P",
+   "camera": "CAM_1P_C03_Observar_Predio",
+   "ia": [
+    "{{NOME}}, existe outra pergunta antes de simplesmente colocar o cinturão.",
+    "Existe uma maneira segura de realizar esse serviço sem expor alguém ao risco de queda?"
+   ],
+   "escolhas": [
+    {
+     "id": "A",
+     "texto": "VERIFICAR OUTRAS FORMAS DE REALIZAR O SERVIÇO.",
+     "correta": true,
+     "ia": [
+      "Boa decisão.",
+      "Se podemos evitar expor alguém ao risco, essa deve ser nossa primeira preocupação.",
+      "Neste caso, o serviço precisa realmente ser executado no quarto pavimento.",
+      "Vamos continuar."
+     ],
+     "tela": {
+      "titulo": "ALTERNATIVAS AVALIADAS",
+      "linhas": [
+       "REALIZAR DO PISO INFERIOR - NÃO E POSSÍVEL.",
+       "UTILIZAR FERRAMENTA DE ALCANCE - NÃO E POSSÍVEL.",
+       "REALIZAR POR OUTRO LOCAL - NÃO E POSSÍVEL."
+      ]
+     },
+     "registro": {
+      "categoria": "PLANEJAMENTO",
+      "resultado": "CORRETO"
+     }
+    },
+    {
+     "id": "B",
+     "texto": "COLOCAR O CINTURÃO E SUBIR.",
+     "correta": false,
+     "ia": [
+      "Existe uma etapa antes disso.",
+      "Primeiro verificamos se e possível evitar a exposição.",
+      "Neste caso não e possível.",
+      "Agora podemos continuar o planejamento."
+     ],
+     "registro": {
+      "categoria": "PLANEJAMENTO",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    },
+    {
+     "id": "C",
+     "texto": "SUBIR PRIMEIRO E ANALISAR LÁ EM CIMA.",
+     "correta": false,
+     "ia": [
+      "Existe uma etapa antes disso.",
+      "Primeiro verificamos se e possível evitar a exposição.",
+      "Neste caso não e possível.",
+      "Agora podemos continuar o planejamento."
+     ],
+     "registro": {
+      "categoria": "PLANEJAMENTO",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    }
+   ],
+   "proxima": "C04"
+  },
+  {
+   "id": "C04",
+   "titulo": "Planejamento",
+   "modo": "1P",
+   "camera": "CAM_1P_C04_Encarregado_Tablet",
+   "mostrar": [
+    "NPC_C04_Encarregado_Entrega_Tablet"
+   ],
+   "ocultar": [
+    "NPC_C02_Encarregado_Conversando"
+   ],
+   "falas": [
+    {
+     "quem": "ENCARREGADO",
+     "texto": "Fizeram praticamente o mesmo serviço no terceiro andar na semana passada."
+    },
+    {
+     "quem": "ENCARREGADO",
+     "texto": "Deve estar tudo igual."
+    }
+   ],
+   "ia": [
+    "{{NOME}}, uma obra muda constantemente.",
+    "Vamos verificar o planejamento preparado para o serviço de hoje."
+   ],
+   "escolhas": [
+    {
+     "id": "A",
+     "texto": "CONFERIR A ANÁLISE DE RISCO E A PERMISSÃO DE TRABALHO ATUAL.",
+     "correta": true,
+     "define": {
+      "DOCUMENTACAO_VERIFICADA": "SIM"
+     },
+     "ia": [
+      "Correto.",
+      "Um serviço parecido não significa que as condições continuam iguais."
+     ],
+     "mostrar": [
+      "MAOS_1P_C05_Tablet_Permissao"
+     ],
+     "registro": {
+      "categoria": "PLANEJAMENTO",
+      "resultado": "CORRETO"
+     }
+    },
+    {
+     "id": "B",
+     "texto": "USAR A DOCUMENTAÇÃO DA SEMANA PASSADA.",
+     "correta": false,
+     "define": {
+      "DOCUMENTACAO_VERIFICADA": "NAO"
+     },
+     "ia": [
+      "Esse documento pertence a outro serviço.",
+      "Materiais mudam de lugar.",
+      "Proteções podem mudar.",
+      "Outras equipes podem começar atividades.",
+      "Vamos conferir o serviço atual."
+     ],
+     "mostrar": [
+      "MAOS_1P_C04_Tablet_Semana_Passada"
+     ],
+     "retornar": true,
+     "registro": {
+      "categoria": "PLANEJAMENTO",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    },
+    {
+     "id": "C",
+     "texto": "O ENCARREGADO JÁ AUTORIZOU. POSSO COMEÇAR.",
+     "correta": false,
+     "ia": [
+      "A autorização verbal não substitui o planejamento necessário para essa atividade."
+     ],
+     "retornar": true,
+     "registro": {
+      "categoria": "PLANEJAMENTO",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    }
+   ],
+   "proxima": "C05"
+  },
+  {
+   "id": "C05",
+   "titulo": "Informações do serviço",
+   "modo": "1P",
+   "camera": "CAM_1P_C05_Tablet_Informacoes",
+   "maos": "MAOS_1P_C05_Tablet_Permissao",
+   "mostrar": [
+    "MAOS_1P_C05_Tablet_Permissao"
+   ],
+   "tela": {
+    "titulo": "PERMISSÃO DE TRABALHO + ANÁLISE DE RISCO",
+    "campos": [
+     [
+      "LOCAL",
+      "QUARTO PAVIMENTO."
+     ],
+     [
+      "ATIVIDADE",
+      "FIXAÇÃO DE SUPORTE."
+     ],
+     [
+      "ACESSO",
+      "ESCADA INTERNA PREVISTA."
+     ],
+     [
+      "PROTEÇÃO DA PERIFERIA",
+      "GUARDA-CORPO."
+     ],
+     [
+      "ÁREA DE EXECUÇÃO",
+      "UTILIZAR SISTEMA DE PROTEÇÃO DEFINIDO PARA A ATIVIDADE."
+     ],
+     [
+      "ÁREA ABAIXO",
+      "MANTER ISOLADA."
+     ],
+     [
+      "FERRAMENTAS",
+      "PROTEGER CONTRA QUEDA."
+     ],
+     [
+      "COMUNICAÇÃO",
+      "RÁDIO."
+     ],
+     [
+      "CONDIÇÕES DO AMBIENTE",
+      "VERIFICAR ANTES E DURANTE A ATIVIDADE."
+     ],
+     [
+      "EMERGÊNCIA",
+      "ACIONAR PROCEDIMENTO DEFINIDO PARA A OBRA."
+     ]
+    ]
+   },
+   "ia": [
+    "{{NOME}}, não precisa decorar isso.",
+    "Você precisa verificar se o que foi planejado realmente existe no local."
+   ],
+   "nota": "Esta tela pode ser reaberta a qualquer momento (botão CONSULTAR PLANEJAMENTO) - e usada no EV16.",
+   "proxima": "C06"
+  },
+  {
+   "id": "C06",
+   "titulo": "Escolha e inspeção dos equipamentos",
+   "modo": "1P",
+   "camera": "CAM_1P_C06_Area_Equipamentos",
+   "ambiente": "bancada com capacetes, cinturões, talabartes, conectores e bolsa de ferramentas; alguns itens com defeito",
+   "ia": [
+    "Observe antes de escolher."
+   ],
+   "subcenas": [
+    {
+     "id": "C06a",
+     "titulo": "Capacete",
+     "camera": "CAM_1P_C06_Inspecao_Capacete",
+     "foco": "C06_Capacete_03_Rachado",
+     "ia": [
+      "Um dos capacetes apresenta rachadura."
+     ],
+     "escolhas": [
+      {
+       "id": "A",
+       "texto": "RETIRAR DE USO.",
+       "correta": true,
+       "define": {
+        "CAPACETE_DANIFICADO": "NAO"
+       },
+       "ia": [
+        "Boa decisão.",
+        "Equipamento danificado não deve continuar sendo utilizado."
+       ],
+       "registro": {
+        "categoria": "INSPECAO_DOS_EQUIPAMENTOS",
+        "resultado": "CORRETO"
+       }
+      },
+      {
+       "id": "B",
+       "texto": "USAR MESMO ASSIM.",
+       "correta": false,
+       "define": {
+        "CAPACETE_DANIFICADO": "SIM"
+       },
+       "ia": [
+        "Decisão registrada."
+       ],
+       "registro": {
+        "categoria": "INSPECAO_DOS_EQUIPAMENTOS",
+        "resultado": "PRECISA_MELHORAR"
+       }
+      }
+     ]
+    },
+    {
+     "id": "C06b",
+     "titulo": "Cinturão",
+     "camera": "CAM_1P_C06_Inspecao_Cinturao",
+     "foco": "C06_Cinturao_02_Corte_Fita",
+     "ia": [
+      "{{NOME}}, observe as fitas, costuras e fivelas."
+     ],
+     "escolhas": [
+      {
+       "id": "A",
+       "texto": "RETIRAR DE USO.",
+       "correta": true,
+       "define": {
+        "CINTURAO_DANIFICADO": "NAO"
+       },
+       "ia": [
+        "Boa decisão.",
+        "Equipamento danificado deve ser retirado de uso."
+       ],
+       "registro": {
+        "categoria": "INSPECAO_DOS_EQUIPAMENTOS",
+        "resultado": "CORRETO"
+       }
+      },
+      {
+       "id": "B",
+       "texto": "O CORTE É PEQUENO. VOU USAR.",
+       "correta": false,
+       "define": {
+        "CINTURAO_DANIFICADO": "SIM"
+       },
+       "ia": [
+        "Decisão registrada."
+       ],
+       "registro": {
+        "categoria": "INSPECAO_DOS_EQUIPAMENTOS",
+        "resultado": "PRECISA_MELHORAR"
+       },
+       "erro_critico": true
+      }
+     ]
+    },
+    {
+     "id": "C06c",
+     "titulo": "Talabarte",
+     "camera": "CAM_1P_C06_Inspecao_Talabarte",
+     "foco": "C06_Talabarte_02_Desgastado",
+     "escolhas": [
+      {
+       "id": "A",
+       "texto": "RETIRAR DE USO.",
+       "correta": true,
+       "define": {
+        "TALABARTE_DANIFICADO": "NAO"
+       },
+       "ia": [
+        "Boa decisão.",
+        "Retire o equipamento de uso e solicite outro."
+       ],
+       "registro": {
+        "categoria": "INSPECAO_DOS_EQUIPAMENTOS",
+        "resultado": "CORRETO"
+       }
+      },
+      {
+       "id": "B",
+       "texto": "USAR COM CUIDADO.",
+       "correta": false,
+       "define": {
+        "TALABARTE_DANIFICADO": "SIM"
+       },
+       "ia": [
+        "Decisão registrada."
+       ],
+       "registro": {
+        "categoria": "INSPECAO_DOS_EQUIPAMENTOS",
+        "resultado": "PRECISA_MELHORAR"
+       },
+       "erro_critico": true
+      },
+      {
+       "id": "C",
+       "texto": "TENTAR CONSERTAR.",
+       "correta": false,
+       "ia": [
+        "Não improvise, {{NOME}}.",
+        "Retire o equipamento de uso e solicite outro."
+       ],
+       "retornar": true,
+       "registro": {
+        "categoria": "INSPECAO_DOS_EQUIPAMENTOS",
+        "resultado": "PRECISA_MELHORAR"
+       }
+      }
+     ]
+    }
+   ],
+   "nota": "Não revelar grande consequência agora: CAPACETE/CINTURÃO/TALABARTE_DANIFICADO reaparecem na consequência final.",
+   "proxima": "C07"
+  },
+  {
+   "id": "C07",
+   "titulo": "Colocando o cinturão",
+   "modo": "3P",
+   "camera": "CAM_3P_C07_Conferencia_Cinturao",
+   "excecao_3p": "o próprio roteiro pede 3a pessoa nesta cena (o jogador precisa se ver vestindo o equipamento)",
+   "sorteio_erro": [
+    "AVATAR_C07_Erro_Fita_Torcida",
+    "AVATAR_C07_Erro_Fivela_Aberta",
+    "AVATAR_C07_Erro_Ajuste_Frouxo",
+    "AVATAR_C07_Erro_Colocado_Invertido"
+   ],
+   "ia": [
+    "{{NOME}}, alguma coisa não esta certa.",
+    "Observe novamente."
+   ],
+   "escolhas": [
+    {
+     "id": "A",
+     "texto": "CORRIGIR O QUE ESTA ERRADO.",
+     "correta": true,
+     "define": {
+      "CINTURAO_AJUSTADO": "SIM"
+     },
+     "ia": [
+      "Agora sim."
+     ],
+     "mostrar": [
+      "AVATAR_C07_Cinturao_Correto"
+     ],
+     "registro": {
+      "categoria": "INSPECAO_DOS_EQUIPAMENTOS",
+      "resultado": "CORRETO"
+     }
+    },
+    {
+     "id": "B",
+     "texto": "ESTÁ BOM ASSIM.",
+     "correta": false,
+     "define": {
+      "CINTURAO_AJUSTADO": "NAO"
+     },
+     "ia": [
+      "Observe novamente.",
+      "Um equipamento mal colocado não protege como deveria."
+     ],
+     "retornar": true,
+     "registro": {
+      "categoria": "INSPECAO_DOS_EQUIPAMENTOS",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    }
+   ],
+   "proxima": "C08"
+  },
+  {
+   "id": "C08",
+   "titulo": "Caminho até o acesso",
+   "modo": "1P",
+   "camera": "CAM_1P_C08_Caminho_Obstaculo",
+   "mostrar": [
+    "C08_Materiais_Bloqueando_Caminho"
+   ],
+   "ia": [
+    "Durante o caminho existem materiais bloqueando parcialmente a circulação."
+   ],
+   "escolhas": [
+    {
+     "id": "A",
+     "texto": "PEDIR PARA LIBERAR O ACESSO.",
+     "correta": true,
+     "ia": [
+      "Boa decisão.",
+      "Não normalize obstáculos no caminho."
+     ],
+     "mostrar": [
+      "C08_Materiais_Liberados_Organizados"
+     ],
+     "ocultar": [
+      "C08_Materiais_Bloqueando_Caminho"
+     ],
+     "registro": {
+      "categoria": "OBSERVACAO_DO_CANTEIRO",
+      "resultado": "CORRETO"
+     }
+    },
+    {
+     "id": "B",
+     "texto": "PASSAR POR CIMA.",
+     "correta": false,
+     "consequencia": {
+      "modo": "3P",
+      "camera": "CAM_3P_C08_Tropeco_Obstaculo",
+      "motivo": "mostrar a consequência da escolha",
+      "mostrar": [
+       "AVATAR_C08_Tropeco"
+      ],
+      "ia": [
+       "Quase, {{NOME}}.",
+       "Um acidente pode acontecer antes mesmo de chegar ao trabalho em altura.",
+       "Não normalize obstáculos no caminho."
+      ],
+      "voltar_para": "1P"
+     },
+     "registro": {
+      "categoria": "OBSERVACAO_DO_CANTEIRO",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    }
+   ],
+   "proxima": "C09"
+  },
+  {
+   "id": "C09",
+   "titulo": "Escada de acesso",
+   "modo": "1P",
+   "camera": "CAM_1P_C09_Escolha_Acesso",
+   "ia": [
+    "Qual caminho você utiliza?"
+   ],
+   "escolhas": [
+    {
+     "id": "A",
+     "texto": "ACESSO PREVISTO.",
+     "correta": true,
+     "define": {
+      "ACESSO_CORRETO": "SIM"
+     },
+     "ia": [
+      "Correto.",
+      "O acesso previsto para a atividade e o caminho a ser utilizado."
+     ],
+     "registro": {
+      "categoria": "ACESSO",
+      "resultado": "CORRETO"
+     },
+     "rota": "R02_Acesso_Previsto"
+    },
+    {
+     "id": "B",
+     "texto": "ESCADA PORTATIL PARA ECONOMIZAR TEMPO.",
+     "correta": false,
+     "define": {
+      "ACESSO_CORRETO": "NAO"
+     },
+     "ia": [
+      "Essa escada não foi definida como acesso para esta atividade.",
+      "O caminho mais rápido nem sempre é o caminho seguro."
+     ],
+     "retornar": true,
+     "registro": {
+      "categoria": "ACESSO",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    }
+   ],
+   "proxima": "C10"
+  },
+  {
+   "id": "C10",
+   "titulo": "Primeira abertura no piso (2o pavimento)",
+   "modo": "1P",
+   "camera": "CAM_1P_C10_Pav02_Abertura_Protegida",
+   "ia": [
+    "Observe essa abertura.",
+    "Ela esta protegida.",
+    "Proteções como essa não devem ser retiradas ou alteradas sem autorização."
+   ],
+   "proxima": "C11"
+  },
+  {
+   "id": "C11",
+   "titulo": "Abertura com problema (3o pavimento)",
+   "modo": "1P",
+   "camera": "CAM_1P_C11_Pav03_Abertura_Deslocada",
+   "mostrar": [
+    "C11_Pav03_Abertura_Protecao_Deslocada"
+   ],
+   "ia": [
+    "{{NOME}}, existe alguma coisa diferente aqui?"
+   ],
+   "escolhas": [
+    {
+     "id": "A",
+     "texto": "IMPEDIR A PASSAGEM E COMUNICAR.",
+     "correta": true,
+     "define": {
+      "ABERTURA_IGNORADA": "NAO"
+     },
+     "ia": [
+      "Boa decisão.",
+      "Um risco não deixa de existir porque não pertence à sua tarefa."
+     ],
+     "mostrar": [
+      "C11_Pav03_Passagem_Impedida_Cones",
+      "C11_Pav03_Abertura_Corrigida",
+      "NPC_C11_Equipe_Corrige_Ajoelhado",
+      "NPC_C11_Equipe_Corrige_Em_Pe"
+     ],
+     "ocultar": [
+      "C11_Pav03_Abertura_Protecao_Deslocada"
+     ],
+     "registro": {
+      "categoria": "ABERTURAS_E_PROTECOES",
+      "resultado": "CORRETO"
+     }
+    },
+    {
+     "id": "B",
+     "texto": "NÃO E MINHA ÁREA. CONTINUAR.",
+     "correta": false,
+     "define": {
+      "ABERTURA_IGNORADA": "SIM"
+     },
+     "ia": [
+      "Decisão registrada."
+     ],
+     "registro": {
+      "categoria": "ABERTURAS_E_PROTECOES",
+      "resultado": "PRECISA_MELHORAR"
+     },
+     "nota_dev": "sem consequência imediata - ver consequência CONSEQ_ABERTURA_IGNORADA"
+    },
+    {
+     "id": "C",
+     "texto": "COLOCAR UMA MADEIRA SOLTA POR CIMA.",
+     "correta": false,
+     "ia": [
+      "Não improvise.",
+      "Uma madeira solta pode sair do lugar.",
+      "Proteja a área e comunique o problema."
+     ],
+     "mostrar": [
+      "C11_Pav03_Madeira_Solta_Improvisada"
+     ],
+     "retornar": true,
+     "registro": {
+      "categoria": "ABERTURAS_E_PROTECOES",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    }
+   ],
+   "proxima": "C12"
+  },
+  {
+   "id": "C12",
+   "titulo": "Chegada ao quarto pavimento",
+   "modo": "1P",
+   "camera": "CAM_1P_C12_Chegada_Pav04",
+   "ia": [
+    "{{NOME}}, chegamos ao local.",
+    "Agora compare o que você encontrou com o que foi planejado."
+   ],
+   "tela": {
+    "botoes": [
+     "CONSULTAR PLANEJAMENTO"
+    ]
+   },
+   "proxima": "C13"
+  },
+  {
+   "id": "C13",
+   "titulo": "Guarda-corpo com problema",
+   "modo": "1P",
+   "camera": "CAM_1P_C13_Guarda_Corpo_Solto",
+   "mostrar": [
+    "C13_GcR_Sul05a_Levemente_Solto"
+   ],
+   "ocultar": [
+    "TorreA_Pav04_GcR_Sul_05a"
+   ],
+   "ia": [
+    "Uma parte do guarda-corpo está levemente solta.",
+    "Aproxime-se e observe."
+   ],
+   "escolhas": [
+    {
+     "id": "A",
+     "texto": "COMUNICAR E AGUARDAR A CORREÇÃO.",
+     "correta": true,
+     "define": {
+      "GUARDA_CORPO_PROBLEMA": "NAO"
+     },
+     "ia": [
+      "Correto.",
+      "Uma proteção não precisa estar caída para apresentar um problema."
+     ],
+     "mostrar": [
+      "TorreA_Pav04_GcR_Sul_05a"
+     ],
+     "ocultar": [
+      "C13_GcR_Sul05a_Levemente_Solto"
+     ],
+     "registro": {
+      "categoria": "ABERTURAS_E_PROTECOES",
+      "resultado": "CORRETO"
+     }
+    },
+    {
+     "id": "B",
+     "texto": "ESTÁ DE PÉ. PODE SER USADO.",
+     "correta": false,
+     "define": {
+      "GUARDA_CORPO_PROBLEMA": "SIM"
+     },
+     "ia": [
+      "Decisão registrada."
+     ],
+     "registro": {
+      "categoria": "ABERTURAS_E_PROTECOES",
+      "resultado": "PRECISA_MELHORAR"
+     },
+     "nota_dev": "consequência futura possível - ver CONSEQ_GUARDA_CORPO_PROBLEMA"
+    },
+    {
+     "id": "C",
+     "texto": "EMPURRAR PARA O LUGAR E CONTINUAR.",
+     "correta": false,
+     "define": {
+      "GUARDA_CORPO_PROBLEMA": "SIM"
+     },
+     "ia": [
+      "Não tente corrigir uma proteção dessa forma.",
+      "Você não sabe se ela esta corretamente fixada."
+     ],
+     "retornar": true,
+     "registro": {
+      "categoria": "ABERTURAS_E_PROTECOES",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    }
+   ],
+   "proxima": "C14"
+  },
+  {
+   "id": "C14",
+   "titulo": "Área abaixo",
+   "modo": "1P",
+   "camera": "CAM_1P_C14_Area_Abaixo",
+   "mostrar": [
+    "C14_Area_Inferior_Nao_Isolada",
+    "NPC_C14_Terreo_Carrinho_Circulando",
+    "NPC_C14_Terreo_Passando_Sob_Borda"
+   ],
+   "ia": [
+    "{{NOME}}, pense também em quem esta lá embaixo."
+   ],
+   "escolhas": [
+    {
+     "id": "A",
+     "texto": "CONFIRMAR O ISOLAMENTO DA ÁREA.",
+     "correta": true,
+     "define": {
+      "AREA_INFERIOR_ISOLADA": "SIM"
+     },
+     "ia": [
+      "Decisão registrada."
+     ],
+     "mostrar": [
+      "C14_Area_Inferior_Isolada",
+      "C14_Barreira_Oeste_Movel"
+     ],
+     "ocultar": [
+      "C14_Area_Inferior_Nao_Isolada",
+      "NPC_C14_Terreo_Passando_Sob_Borda"
+     ],
+     "registro": {
+      "categoria": "PROTECAO_DAS_PESSOAS_ABAIXO",
+      "resultado": "CORRETO"
+     }
+    },
+    {
+     "id": "B",
+     "texto": "TODO MUNDO CONSEGUE VER QUE ESTAMOS TRABALHANDO.",
+     "correta": false,
+     "define": {
+      "AREA_INFERIOR_ISOLADA": "NAO"
+     },
+     "ia": [
+      "Decisão registrada."
+     ],
+     "registro": {
+      "categoria": "PROTECAO_DAS_PESSOAS_ABAIXO",
+      "resultado": "PRECISA_MELHORAR"
+     },
+     "erro_critico": true
+    },
+    {
+     "id": "C",
+     "texto": "É SÓ PEDIR PARA TOMAREM CUIDADO.",
+     "correta": false,
+     "define": {
+      "AREA_INFERIOR_ISOLADA": "NAO"
+     },
+     "ia": [
+      "Decisão registrada."
+     ],
+     "registro": {
+      "categoria": "PROTECAO_DAS_PESSOAS_ABAIXO",
+      "resultado": "PRECISA_MELHORAR"
+     },
+     "erro_critico": true
+    }
+   ],
+   "nota": "A IA responde apenas 'Decisão registrada.' - a consequência aparece na CENA PRINCIPAL.",
+   "proxima": "C15"
+  },
+  {
+   "id": "C15",
+   "titulo": "Material solto",
+   "modo": "1P",
+   "camera": "CAM_1P_C15_Material_Solto",
+   "mostrar": [
+    "C15_Madeira_Solta_Junto_Borda"
+   ],
+   "ia": [
+    "Existe um pequeno pedaço de madeira próximo à borda."
+   ],
+   "escolhas": [
+    {
+     "id": "A",
+     "texto": "RETIRAR.",
+     "correta": true,
+     "define": {
+      "MATERIAL_SOLTO": "NAO"
+     },
+     "ia": [
+      "Decisão registrada."
+     ],
+     "mostrar": [
+      "C15_Madeira_Retirada_Guardada"
+     ],
+     "ocultar": [
+      "C15_Madeira_Solta_Junto_Borda"
+     ],
+     "registro": {
+      "categoria": "QUEDA_DE_FERRAMENTAS_E_MATERIAIS",
+      "resultado": "CORRETO"
+     },
+     "nota_dev": "habilita a consequência POSITIVA CONSEQ_MATERIAL_RETIRADO (mostrar mais tarde, junto do vento)"
+    },
+    {
+     "id": "B",
+     "texto": "DEIXAR.",
+     "correta": false,
+     "define": {
+      "MATERIAL_SOLTO": "SIM"
+     },
+     "ia": [
+      "Decisão registrada."
+     ],
+     "registro": {
+      "categoria": "QUEDA_DE_FERRAMENTAS_E_MATERIAIS",
+      "resultado": "PRECISA_MELHORAR"
+     },
+     "nota_dev": "sem consequência imediata - ver CONSEQ_MATERIAL_SOLTO"
+    }
+   ],
+   "proxima": "C16"
+  },
+  {
+   "id": "C16",
+   "titulo": "Outras equipes",
+   "modo": "1P",
+   "camera": "CAM_1P_C16_Outras_Equipes",
+   "mostrar": [
+    "NPC_C16_Pedreiro_Assentando",
+    "NPC_C16_Servente_Carrinho_Blocos"
+   ],
+   "ia": [
+    "Outras pessoas estão trabalhando perto de você.",
+    "Essa atividade pode interferir na sua?"
+   ],
+   "escolhas": [
+    {
+     "id": "A",
+     "texto": "CONFERIR E COORDENAR AS ATIVIDADES.",
+     "correta": true,
+     "define": {
+      "INTERFERENCIA_EQUIPE": "NAO"
+     },
+     "ia": [
+      "Boa decisão.",
+      "Quando duas atividades podem interferir uma na outra, precisamos conferir antes de continuar."
+     ],
+     "mostrar": [
+      "NPC_Pav04_Encarregado"
+     ],
+     "registro": {
+      "categoria": "OBSERVACAO_DO_CANTEIRO",
+      "resultado": "CORRETO"
+     }
+    },
+    {
+     "id": "B",
+     "texto": "CADA EQUIPE CUIDA DO SEU SERVIÇO.",
+     "correta": false,
+     "define": {
+      "INTERFERENCIA_EQUIPE": "SIM"
+     },
+     "ia": [
+      "Decisão registrada."
+     ],
+     "registro": {
+      "categoria": "OBSERVACAO_DO_CANTEIRO",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    }
+   ],
+   "proxima": "C17"
+  },
+  {
+   "id": "C17",
+   "titulo": "Condições do ambiente",
+   "modo": "1P",
+   "camera": "CAM_1P_C17_Condicoes_Ambiente",
+   "mostrar": [
+    "C17_Fita_Indicadora_Vento",
+    "C17_Biruta_Canteiro",
+    "C17_Lona_Cobrindo_Material"
+   ],
+   "define": {
+    "CONDICAO_AMBIENTAL_SEGURA": "SIM"
+   },
+   "ia": [
+    "Neste momento, as condições permitem continuar.",
+    "Mas continue observando."
+   ],
+   "proxima": "C18"
+  },
+  {
+   "id": "C18",
+   "titulo": "Ponto de conexão",
+   "modo": "1P",
+   "camera": "CAM_1P_C18_Ponto_Conexao",
+   "ambiente": "no mesmo quadro: ponto identificado (PA-04-01), guarda-corpo, vergalhão, tubulação e estrutura metálica",
+   "ia": [
+    "{{NOME}}, identifique onde o sistema previsto para este serviço deve ser conectado."
+   ],
+   "escolhas": [
+    {
+     "id": "A",
+     "texto": "PONTO IDENTIFICADO (PA-04-01).",
+     "correta": true,
+     "define": {
+      "CONEXAO_INCORRETA": "NAO"
+     },
+     "ia": [
+      "Correto.",
+      "Esse é o ponto previsto e identificado para esta atividade."
+     ],
+     "registro": {
+      "categoria": "PROTECAO_CONTRA_QUEDA",
+      "resultado": "CORRETO"
+     },
+     "foco": "C18_Ponto_Ancoragem_PA0401"
+    },
+    {
+     "id": "B",
+     "texto": "GUARDA-CORPO.",
+     "correta": false,
+     "define": {
+      "CONEXAO_INCORRETA": "SIM",
+      "PONTO_ESCOLHIDO": "GUARDA_CORPO"
+     },
+     "ia": [
+      "Decisão registrada."
+     ],
+     "registro": {
+      "categoria": "PROTECAO_CONTRA_QUEDA",
+      "resultado": "PRECISA_MELHORAR"
+     },
+     "erro_critico": true
+    },
+    {
+     "id": "C",
+     "texto": "VERGALHÃO.",
+     "correta": false,
+     "define": {
+      "CONEXAO_INCORRETA": "SIM",
+      "PONTO_ESCOLHIDO": "VERGALHAO"
+     },
+     "ia": [
+      "Decisão registrada."
+     ],
+     "registro": {
+      "categoria": "PROTECAO_CONTRA_QUEDA",
+      "resultado": "PRECISA_MELHORAR"
+     },
+     "erro_critico": true,
+     "foco": "C18_Distrator_Vergalhao"
+    },
+    {
+     "id": "D",
+     "texto": "TUBULAÇÃO.",
+     "correta": false,
+     "define": {
+      "CONEXAO_INCORRETA": "SIM",
+      "PONTO_ESCOLHIDO": "TUBULACAO"
+     },
+     "ia": [
+      "Decisão registrada."
+     ],
+     "registro": {
+      "categoria": "PROTECAO_CONTRA_QUEDA",
+      "resultado": "PRECISA_MELHORAR"
+     },
+     "erro_critico": true,
+     "foco": "C18_Distrator_Tubulacao"
+    },
+    {
+     "id": "E",
+     "texto": "ESTRUTURA METÁLICA.",
+     "correta": false,
+     "define": {
+      "CONEXAO_INCORRETA": "SIM",
+      "PONTO_ESCOLHIDO": "ESTRUTURA_METALICA"
+     },
+     "ia": [
+      "Decisão registrada."
+     ],
+     "registro": {
+      "categoria": "PROTECAO_CONTRA_QUEDA",
+      "resultado": "PRECISA_MELHORAR"
+     },
+     "erro_critico": true,
+     "foco": "C18_Distrator_Estrutura_Metalica"
+    }
+   ],
+   "nota": "Não revelar o erro agora - ver CONSEQ_CONEXAO_INCORRETA. Regra técnica 3: tubulação, vergalhão e guarda-corpo não são ponto de ancoragem por padrão.",
+   "proxima": "C19"
+  },
+  {
+   "id": "C19",
+   "titulo": "Entrando na região de exposição",
+   "modo": "1P",
+   "camera": "CAM_1P_C19_Regiao_Exposicao",
+   "gatilho": "TRG_EXPOSICAO_Zona_Risco_Queda",
+   "ia": [
+    "{{NOME}}, a partir daqui existe risco de queda.",
+    "Permaneça protegido conforme o sistema definido para esse trabalho."
+   ],
+   "escolhas": [
+    {
+     "id": "A",
+     "texto": "REALIZAR A MOVIMENTAÇÃO CORRETAMENTE.",
+     "correta": true,
+     "ia": [
+      "Correto."
+     ],
+     "mostrar": [
+      "AVATAR_TAREFA_Ajoelhado_Conectado"
+     ],
+     "registro": {
+      "categoria": "PROTECAO_CONTRA_QUEDA",
+      "resultado": "CORRETO"
+     }
+    },
+    {
+     "id": "B",
+     "texto": "DESCONECTAR POR ALGUNS SEGUNDOS.",
+     "correta": false,
+     "consequencia": {
+      "modo": "3P",
+      "camera": "CAM_3P_C19_Desconectado_Escorrega",
+      "motivo": "mostrar a consequência da escolha",
+      "mostrar": [
+       "AVATAR_C19_Desconectado_Escorrega"
+      ],
+      "congelar": true,
+      "ia": [
+       "Foram apenas alguns segundos.",
+       "Mas uma queda também pode acontecer em poucos segundos."
+      ],
+      "voltar_para": "1P"
+     },
+     "registro": {
+      "categoria": "PROTECAO_CONTRA_QUEDA",
+      "resultado": "PRECISA_MELHORAR"
+     },
+     "erro_critico": true
+    },
+    {
+     "id": "C",
+     "texto": "IMPROVISAR PARA AUMENTAR O ALCANCE.",
+     "correta": false,
+     "ia": [
+      "Não improvise.",
+      "Se o sistema não atende ao trabalho, pare e comunique."
+     ],
+     "retornar": true,
+     "registro": {
+      "categoria": "PROTECAO_CONTRA_QUEDA",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    },
+    {
+     "id": "D",
+     "texto": "FAZER NO NO EQUIPAMENTO.",
+     "correta": false,
+     "ia": [
+      "Não improvise.",
+      "Se o sistema não atende ao trabalho, pare e comunique."
+     ],
+     "retornar": true,
+     "registro": {
+      "categoria": "PROTECAO_CONTRA_QUEDA",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    }
+   ],
+   "proxima": "C20"
+  },
+  {
+   "id": "C20",
+   "titulo": "Preparação das ferramentas",
+   "modo": "1P",
+   "camera": "CAM_1P_C20_Ferramentas",
+   "mostrar": [
+    "C20_Ferramentas_Soltas",
+    "C20_Base_Apoio_Ferramentas"
+   ],
+   "ia": [
+    "{{NOME}}, o que acontece se alguma dessas ferramentas escapar?"
+   ],
+   "escolhas": [
+    {
+     "id": "A",
+     "texto": "PROTEGER FERRAMENTAS E MATERIAIS CONTRA QUEDA.",
+     "correta": true,
+     "define": {
+      "FERRAMENTAS_PROTEGIDAS": "SIM"
+     },
+     "ia": [
+      "Boa decisão."
+     ],
+     "mostrar": [
+      "C20_Ferramentas_Protegidas"
+     ],
+     "ocultar": [
+      "C20_Ferramentas_Soltas"
+     ],
+     "registro": {
+      "categoria": "QUEDA_DE_FERRAMENTAS_E_MATERIAIS",
+      "resultado": "CORRETO"
+     }
+    },
+    {
+     "id": "B",
+     "texto": "VOU SEGURAR BEM.",
+     "correta": false,
+     "define": {
+      "FERRAMENTAS_PROTEGIDAS": "NAO"
+     },
+     "ia": [
+      "Decisão registrada."
+     ],
+     "registro": {
+      "categoria": "QUEDA_DE_FERRAMENTAS_E_MATERIAIS",
+      "resultado": "PRECISA_MELHORAR"
+     },
+     "erro_critico": true
+    },
+    {
+     "id": "C",
+     "texto": "NINGUÉM VAI FICAR EMBAIXO.",
+     "correta": false,
+     "define": {
+      "FERRAMENTAS_PROTEGIDAS": "NAO"
+     },
+     "ia": [
+      "Decisão registrada."
+     ],
+     "registro": {
+      "categoria": "QUEDA_DE_FERRAMENTAS_E_MATERIAIS",
+      "resultado": "PRECISA_MELHORAR"
+     },
+     "erro_critico": true
+    }
+   ],
+   "proxima": "C21"
+  },
+  {
+   "id": "C21",
+   "titulo": "Início da tarefa",
+   "modo": "1P",
+   "camera": "CAM_1P_C21_Inicio_Tarefa",
+   "maos": "MAOS_1P_C21_Chave",
+   "mostrar": [
+    "MAOS_1P_C21_Chave",
+    "C21_Suporte_Posicionado"
+   ],
+   "ocultar": [
+    "C21_Suporte_Aguardando"
+   ],
+   "etapas": [
+    "posiciona o suporte",
+    "pega a ferramenta",
+    "inicia a fixação",
+    "aperta o primeiro ponto",
+    "verifica posição"
+   ],
+   "ia": [
+    "Vamos começar."
+   ],
+   "abre_eventos": true,
+   "nota": "A partir daqui o sistema de eventos inesperados passa a sortear eventos entre as etapas.",
+   "proxima": "PRINC"
+  }
+ ],
+ "eventos_inesperados": [
+  {
+   "id": "EV01",
+   "titulo": "Alguém remove o guarda-corpo",
+   "modo": "1P",
+   "camera": "CAM_1P_EV01_Colega_Retira_GcR",
+   "variavel_evento": "EVENTO_GUARDA_CORPO_REMOVIDO",
+   "peso": 3,
+   "momento": "durante a preparacao ou a fixacao",
+   "mostrar": [
+    "NPC_EV01_Colega_Retira_GcR",
+    "EV01_Material_Longo_Tubos",
+    "NPC_EV01_Andaime_Recebe_Material"
+   ],
+   "falas": [
+    {
+     "quem": "OUTRO TRABALHADOR",
+     "texto": "Parceiro, vou tirar isso aqui só um minutinho para passar o material."
+    },
+    {
+     "quem": "OUTRO TRABALHADOR",
+     "texto": "É rapidinho."
+    },
+    {
+     "quem": "OUTRO TRABALHADOR",
+     "texto": "Depois eu coloco de volta."
+    }
+   ],
+   "ia_silenciosa": true,
+   "nota": "A IA NÃO interfere. O jogador precisa decidir sozinho.",
+   "escolhas": [
+    {
+     "id": "A",
+     "texto": "PARAR A SITUAÇÃO E INFORMAR QUE A PROTEÇÃO NÃO PODE SER SIMPLESMENTE RETIRADA.",
+     "correta": true,
+     "ia": [
+      "Boa decisão, {{NOME}}.",
+      "A proteção existia por um motivo.",
+      "Uma necessidade de produção não permite simplesmente criar uma abertura perigosa."
+     ],
+     "mostrar": [
+      "NPC_Pav04_Encarregado"
+     ],
+     "ocultar": [
+      "NPC_EV01_Colega_Retira_GcR"
+     ],
+     "registro": {
+      "categoria": "ABERTURAS_E_PROTECOES",
+      "resultado": "CORRETO"
+     },
+     "falas": [
+      {
+       "quem": "TRABALHADOR",
+       "texto": "Não retire a proteção assim."
+      },
+      {
+       "quem": "TRABALHADOR",
+       "texto": "Vamos comunicar e fazer isso da forma prevista."
+      }
+     ]
+    },
+    {
+     "id": "B",
+     "texto": "DEIXAR. ELE DISSE QUE VAI COLOCAR DE VOLTA.",
+     "correta": false,
+     "mostrar": [
+      "EV01_GcR_Sul04a_Removido_Vao_Aberto",
+      "EV01_Pecas_GcR_Retiradas_no_Piso"
+     ],
+     "ocultar": [
+      "TorreA_Pav04_GcR_Sul_04a",
+      "NPC_EV01_Colega_Retira_GcR"
+     ],
+     "consequencia": {
+      "modo": "3P",
+      "camera": "CAM_3P_EV01_Vao_Aberto",
+      "motivo": "mostrar a consequência da escolha",
+      "mostrar": [
+       "EV01_GcR_Sul04a_Removido_Vao_Aberto",
+       "EV01_Pecas_GcR_Retiradas_no_Piso"
+      ],
+      "ocultar": [
+       "TorreA_Pav04_GcR_Sul_04a"
+      ],
+      "ia": [
+       "{{NOME}}, lembra do 'e rapidinho'?",
+       "A proteção ainda não voltou para o lugar.",
+       "Uma situação temporária acabou criando um risco para todos que trabalham aqui."
+      ],
+      "nota": "mostrar alguns minutos depois, quando o jogador passar próximo do vão",
+      "voltar_para": "1P"
+     },
+     "registro": {
+      "categoria": "ABERTURAS_E_PROTECOES",
+      "resultado": "PRECISA_MELHORAR"
+     },
+     "erro_critico": true
+    },
+    {
+     "id": "C",
+     "texto": "AFASTAR-ME UM POUCO ENQUANTO ELE PASSA O MATERIAL.",
+     "correta": false,
+     "mostrar": [
+      "EV01_GcR_Sul04a_Removido_Vao_Aberto",
+      "EV01_Pecas_GcR_Retiradas_no_Piso"
+     ],
+     "ocultar": [
+      "TorreA_Pav04_GcR_Sul_04a",
+      "NPC_EV01_Colega_Retira_GcR"
+     ],
+     "consequencia": {
+      "modo": "3P",
+      "camera": "CAM_3P_EV01_Vao_Aberto",
+      "motivo": "mostrar a consequência da escolha",
+      "mostrar": [
+       "EV01_GcR_Sul04a_Removido_Vao_Aberto",
+       "EV01_Pecas_GcR_Retiradas_no_Piso"
+      ],
+      "ocultar": [
+       "TorreA_Pav04_GcR_Sul_04a"
+      ],
+      "ia": [
+       "{{NOME}}, lembra do 'e rapidinho'?",
+       "A proteção ainda não voltou para o lugar.",
+       "Uma situação temporária acabou criando um risco para todos que trabalham aqui."
+      ],
+      "voltar_para": "1P"
+     },
+     "registro": {
+      "categoria": "ABERTURAS_E_PROTECOES",
+      "resultado": "PRECISA_MELHORAR"
+     },
+     "erro_critico": true
+    }
+   ]
+  },
+  {
+   "id": "EV02",
+   "titulo": "Trabalhador entra na área isolada",
+   "modo": "1P",
+   "camera": "CAM_1P_EV02_Invasao_Area_Isolada",
+   "variavel_evento": "EVENTO_INVASAO_AREA_ISOLADA",
+   "peso": 3,
+   "requer": {
+    "AREA_INFERIOR_ISOLADA": "SIM"
+   },
+   "mostrar": [
+    "C14_Area_Inferior_Isolada",
+    "EV02_Barreira_Afastada",
+    "NPC_EV02_Afasta_Barreira_Entra"
+   ],
+   "ocultar": [
+    "C14_Barreira_Oeste_Movel"
+   ],
+   "ia": [
+    "{{NOME}}, observe a área abaixo."
+   ],
+   "escolhas": [
+    {
+     "id": "A",
+     "texto": "INTERROMPER A ATIVIDADE E PEDIR PARA RESTABELECER O ISOLAMENTO.",
+     "correta": true,
+     "ia": [
+      "Correto.",
+      "Uma proteção deixa de cumprir sua função quando alguém passa por ela."
+     ],
+     "mostrar": [
+      "C14_Barreira_Oeste_Movel"
+     ],
+     "ocultar": [
+      "EV02_Barreira_Afastada",
+      "NPC_EV02_Afasta_Barreira_Entra"
+     ],
+     "registro": {
+      "categoria": "PROTECAO_DAS_PESSOAS_ABAIXO",
+      "resultado": "CORRETO"
+     }
+    },
+    {
+     "id": "B",
+     "texto": "ELE VAI PASSAR RÁPIDO.",
+     "correta": false,
+     "consequencia": {
+      "modo": "3P",
+      "camera": "CAM_3P_EV02_Peca_Escapa",
+      "motivo": "mostrar a consequência da escolha",
+      "mostrar": [
+       "EV02_Barreira_Afastada",
+       "NPC_EV02_Dentro_Area_Isolada",
+       "EV02_Peca_Escapa_Congelada"
+      ],
+      "congelar": true,
+      "ia": [
+       "O isolamento existia.",
+       "Mas quando ele deixou de funcionar, o trabalho continuou.",
+       "A situação precisava ter sido corrigida antes de prosseguir."
+      ],
+      "voltar_para": "1P"
+     },
+     "registro": {
+      "categoria": "PROTECAO_DAS_PESSOAS_ABAIXO",
+      "resultado": "PRECISA_MELHORAR"
+     },
+     "erro_critico": true
+    },
+    {
+     "id": "C",
+     "texto": "GRITAR PARA ELE TOMAR CUIDADO E CONTINUAR.",
+     "correta": false,
+     "consequencia": {
+      "modo": "3P",
+      "camera": "CAM_3P_EV02_Peca_Escapa",
+      "motivo": "mostrar a consequência da escolha",
+      "mostrar": [
+       "EV02_Barreira_Afastada",
+       "NPC_EV02_Dentro_Area_Isolada",
+       "EV02_Peca_Escapa_Congelada"
+      ],
+      "congelar": true,
+      "ia": [
+       "O isolamento existia.",
+       "Mas quando ele deixou de funcionar, o trabalho continuou.",
+       "A situação precisava ter sido corrigida antes de prosseguir."
+      ],
+      "voltar_para": "1P"
+     },
+     "registro": {
+      "categoria": "PROTECAO_DAS_PESSOAS_ABAIXO",
+      "resultado": "PRECISA_MELHORAR"
+     },
+     "erro_critico": true
+    }
+   ]
+  },
+  {
+   "id": "EV03",
+   "titulo": "Objeto cai de um pavimento superior",
+   "modo": "1P",
+   "camera": "CAM_1P_EV03_Objeto_Cai_Superior",
+   "variavel_evento": "EVENTO_OBJETO_SUPERIOR",
+   "peso": 3,
+   "som": "CLANG!",
+   "mostrar": [
+    "EV03_Objeto_01_Impacto_Proximo",
+    "NPC_EV03_Colega_Assustado",
+    "EV03_Origem_Blocos_Junto_Borda_Pav05"
+   ],
+   "falas": [
+    {
+     "quem": "COLEGA",
+     "texto": "Caramba!"
+    }
+   ],
+   "ia": [
+    "{{NOME}}, alguma coisa acabou de mudar no ambiente.",
+    "O que você faz?"
+   ],
+   "escolhas": [
+    {
+     "id": "A",
+     "texto": "INTERROMPER A ATIVIDADE E COMUNICAR A QUEDA DO MATERIAL.",
+     "correta": true,
+     "ia": [
+      "Correto.",
+      "O objeto não atingiu ninguém.",
+      "Mas isso não significa que devemos ignorar o que aconteceu.",
+      "A origem precisa ser verificada antes de continuar expondo pessoas."
+     ],
+     "registro": {
+      "categoria": "REACAO_A_SITUACOES_INESPERADAS",
+      "resultado": "CORRETO"
+     }
+    },
+    {
+     "id": "B",
+     "texto": "NÃO ATINGIU NINGUÉM. CONTINUAR.",
+     "correta": false,
+     "consequencia": {
+      "modo": "3P",
+      "camera": "CAM_3P_EV03_Segundo_Objeto",
+      "motivo": "mostrar a consequência da escolha",
+      "mostrar": [
+       "EV03_Objeto_02_Congelado_Mais_Proximo",
+       "EV03_Objeto_01_Impacto_Proximo",
+       "AVATAR_TAREFA_Ajoelhado_Conectado"
+      ],
+      "congelar": true,
+      "ia": [
+       "O primeiro objeto foi um aviso.",
+       "A ausência de acidente não significava ausência de risco."
+      ],
+      "voltar_para": "1P"
+     },
+     "registro": {
+      "categoria": "REACAO_A_SITUACOES_INESPERADAS",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    },
+    {
+     "id": "C",
+     "texto": "OLHAR RAPIDAMENTE PARA CIMA E CONTINUAR.",
+     "correta": false,
+     "consequencia": {
+      "modo": "3P",
+      "camera": "CAM_3P_EV03_Segundo_Objeto",
+      "motivo": "mostrar a consequência da escolha",
+      "mostrar": [
+       "EV03_Objeto_02_Congelado_Mais_Proximo",
+       "EV03_Objeto_01_Impacto_Proximo",
+       "AVATAR_TAREFA_Ajoelhado_Conectado"
+      ],
+      "congelar": true,
+      "ia": [
+       "O primeiro objeto foi um aviso.",
+       "A ausência de acidente não significava ausência de risco."
+      ],
+      "voltar_para": "1P"
+     },
+     "registro": {
+      "categoria": "REACAO_A_SITUACOES_INESPERADAS",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    }
+   ]
+  },
+  {
+   "id": "EV04",
+   "titulo": "Movimentação de carga próxima",
+   "modo": "1P",
+   "camera": "CAM_1P_EV04_Movimentacao_Carga",
+   "variavel_evento": "EVENTO_MOVIMENTACAO_CARGA",
+   "peso": 2,
+   "mostrar": [
+    "EV04_Paleteira_Palete_Inicio",
+    "NPC_EV04_Operador_Paleteira_Inicio",
+    "NPC_Pav04_Encarregado"
+   ],
+   "falas": [
+    {
+     "quem": "RADIO",
+     "texto": "Vamos fazer uma movimentação aqui do lado."
+    },
+    {
+     "quem": "ENCARREGADO",
+     "texto": "Dá para vocês dois trabalharem ao mesmo tempo."
+    }
+   ],
+   "escolhas": [
+    {
+     "id": "A",
+     "texto": "PARAR E CONFIRMAR SE A MOVIMENTAÇÃO É COMPATÍVEL COM O SERVIÇO.",
+     "correta": true,
+     "define": {
+      "INTERFERENCIA_EQUIPE": "NAO"
+     },
+     "ia": [
+      "Boa decisão.",
+      "Quando duas atividades podem interferir uma na outra, precisamos conferir antes de continuar."
+     ],
+     "registro": {
+      "categoria": "OBSERVACAO_DO_CANTEIRO",
+      "resultado": "CORRETO"
+     }
+    },
+    {
+     "id": "B",
+     "texto": "CONTINUAR. CADA UM FICA NO SEU CANTO.",
+     "correta": false,
+     "define": {
+      "INTERFERENCIA_EQUIPE": "SIM"
+     },
+     "consequencia": {
+      "modo": "3P",
+      "camera": "CAM_3P_EV04_Carga_Aproxima",
+      "motivo": "mostrar a consequência da escolha",
+      "mostrar": [
+       "EV04_Paleteira_Palete_Aproximando",
+       "NPC_EV04_Operador_Paleteira_Aproximando",
+       "NPC_EV04_Auxiliar_Entra_Na_Area",
+       "AVATAR_TAREFA_Ajoelhado_Conectado"
+      ],
+      "ocultar": [
+       "EV04_Paleteira_Palete_Inicio",
+       "NPC_EV04_Operador_Paleteira_Inicio"
+      ],
+      "congelar": true,
+      "ia": [
+       "Duas atividades seguras quando feitas separadamente podem criar novos riscos quando acontecem juntas."
+      ],
+      "voltar_para": "1P"
+     },
+     "registro": {
+      "categoria": "OBSERVACAO_DO_CANTEIRO",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    },
+    {
+     "id": "C",
+     "texto": "TERMINAR RÁPIDO ANTES DA CARGA CHEGAR.",
+     "correta": false,
+     "define": {
+      "INTERFERENCIA_EQUIPE": "SIM"
+     },
+     "consequencia": {
+      "modo": "3P",
+      "camera": "CAM_3P_EV04_Carga_Aproxima",
+      "motivo": "mostrar a consequência da escolha",
+      "mostrar": [
+       "EV04_Paleteira_Palete_Aproximando",
+       "NPC_EV04_Operador_Paleteira_Aproximando",
+       "NPC_EV04_Auxiliar_Entra_Na_Area",
+       "AVATAR_TAREFA_Ajoelhado_Conectado"
+      ],
+      "ocultar": [
+       "EV04_Paleteira_Palete_Inicio",
+       "NPC_EV04_Operador_Paleteira_Inicio"
+      ],
+      "congelar": true,
+      "ia": [
+       "Duas atividades seguras quando feitas separadamente podem criar novos riscos quando acontecem juntas."
+      ],
+      "voltar_para": "1P"
+     },
+     "registro": {
+      "categoria": "OBSERVACAO_DO_CANTEIRO",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    }
+   ]
+  },
+  {
+   "id": "EV05",
+   "titulo": "O rádio para de funcionar",
+   "modo": "1P",
+   "camera": "CAM_1P_EV05_Radio_Sem_Resposta",
+   "variavel_evento": "EVENTO_RADIO",
+   "peso": 3,
+   "maos": "MAOS_1P_EV05_Radio",
+   "mostrar": [
+    "MAOS_1P_EV05_Radio"
+   ],
+   "som": "chiado",
+   "falas": [
+    {
+     "quem": "TRABALHADOR",
+     "texto": "Encarregado, está me ouvindo?"
+    }
+   ],
+   "ia": [
+    "{{NOME}}, o meio de comunicação previsto não esta funcionando."
+   ],
+   "escolhas": [
+    {
+     "id": "A",
+     "texto": "INTERROMPER E RESTABELECER A COMUNICAÇÃO.",
+     "correta": true,
+     "define": {
+      "COMUNICACAO_FUNCIONANDO": "SIM"
+     },
+     "ia": [
+      "Correto.",
+      "Se a comunicação faz parte do planejamento, não continue simplesmente como se nada tivesse mudado."
+     ],
+     "mostrar": [
+      "NPC_EV05_Encarregado_Radio_Substituto"
+     ],
+     "registro": {
+      "categoria": "COMUNICACAO",
+      "resultado": "CORRETO"
+     },
+     "nota_dev": "habilita a consequência POSITIVA CONSEQ_COMUNICACAO_RESTABELECIDA"
+    },
+    {
+     "id": "B",
+     "texto": "ESTOU QUASE TERMINANDO. CONTINUAR.",
+     "correta": false,
+     "define": {
+      "COMUNICACAO_FUNCIONANDO": "NAO"
+     },
+     "consequencia": {
+      "modo": "3P",
+      "camera": "CAM_3P_EV05_Radio_Sem_Resposta",
+      "motivo": "mostrar a consequência da escolha",
+      "mostrar": [
+       "AVATAR_EV05_Radio_Sem_Resposta"
+      ],
+      "ia": [
+       "O problema parecia pequeno quando apareceu.",
+       "Agora você esta precisando justamente da comunicação que decidiu ignorar."
+      ],
+      "nota": "mostrar mais tarde, quando o jogador precisar pedir ajuda",
+      "voltar_para": "1P"
+     },
+     "registro": {
+      "categoria": "COMUNICACAO",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    },
+    {
+     "id": "C",
+     "texto": "SE ACONTECER ALGUMA COISA, EU GRITO.",
+     "correta": false,
+     "define": {
+      "COMUNICACAO_FUNCIONANDO": "NAO"
+     },
+     "consequencia": {
+      "modo": "3P",
+      "camera": "CAM_3P_EV05_Radio_Sem_Resposta",
+      "motivo": "mostrar a consequência da escolha",
+      "mostrar": [
+       "AVATAR_EV05_Radio_Sem_Resposta"
+      ],
+      "ia": [
+       "O problema parecia pequeno quando apareceu.",
+       "Agora você esta precisando justamente da comunicação que decidiu ignorar."
+      ],
+      "voltar_para": "1P"
+     },
+     "registro": {
+      "categoria": "COMUNICACAO",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    }
+   ]
+  },
+  {
+   "id": "EV06",
+   "titulo": "Rajada de vento",
+   "modo": "1P",
+   "camera": "CAM_1P_EV06_Rajada_Vento",
+   "variavel_evento": "EVENTO_VENTO",
+   "peso": 2,
+   "mostrar": [
+    "EV06_Lona_Batendo_Poeira"
+   ],
+   "ocultar": [
+    "C17_Lona_Cobrindo_Material"
+   ],
+   "falas": [
+    {
+     "quem": "ENCARREGADO (RADIO)",
+     "texto": "{{NOME}}, falta pouco?"
+    },
+    {
+     "quem": "ENCARREGADO (RADIO)",
+     "texto": "Se der, termina antes de piorar."
+    }
+   ],
+   "escolhas": [
+    {
+     "id": "A",
+     "texto": "INTERROMPER E REAVALIAR AS CONDIÇÕES.",
+     "correta": true,
+     "define": {
+      "CONDICAO_AMBIENTAL_SEGURA": "NAO"
+     },
+     "consequencia": {
+      "modo": "3P",
+      "camera": "CAM_3P_EV06_A_Rajada_Forte",
+      "motivo": "mostrar a consequência da escolha",
+      "mostrar": [
+       "AVATAR_EV06_A_Parado_Area_Segura",
+       "EV06_Lona_Batendo_Poeira"
+      ],
+      "ocultar": [
+       "C17_Lona_Cobrindo_Material"
+      ],
+      "ia": [
+       "Observe.",
+       "As condições pioraram.",
+       "Parar antes evitou que você permanecesse exposto."
+      ],
+      "voltar_para": "1P"
+     },
+     "registro": {
+      "categoria": "MUDANCA_NAS_CONDICOES",
+      "resultado": "CORRETO"
+     }
+    },
+    {
+     "id": "B",
+     "texto": "TERMINAR RÁPIDO.",
+     "correta": false,
+     "consequencia": {
+      "modo": "3P",
+      "camera": "CAM_3P_EV06_Rajada_Desequilibrio",
+      "motivo": "mostrar a consequência da escolha",
+      "mostrar": [
+       "AVATAR_EV06_Desequilibrio_Sistema_Atua",
+       "EV06_Lona_Batendo_Poeira"
+      ],
+      "ocultar": [
+       "C17_Lona_Cobrindo_Material"
+      ],
+      "congelar": true,
+      "ia": [
+       "Faltava pouco.",
+       "Mas o risco não diminui porque o serviço esta quase terminado."
+      ],
+      "voltar_para": "1P"
+     },
+     "registro": {
+      "categoria": "MUDANCA_NAS_CONDICOES",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    },
+    {
+     "id": "C",
+     "texto": "CONTINUAR COM MAIS CUIDADO.",
+     "correta": false,
+     "consequencia": {
+      "modo": "3P",
+      "camera": "CAM_3P_EV06_Rajada_Desequilibrio",
+      "motivo": "mostrar a consequência da escolha",
+      "mostrar": [
+       "AVATAR_EV06_Desequilibrio_Sistema_Atua",
+       "EV06_Lona_Batendo_Poeira"
+      ],
+      "ocultar": [
+       "C17_Lona_Cobrindo_Material"
+      ],
+      "congelar": true,
+      "ia": [
+       "Faltava pouco.",
+       "Mas o risco não diminui porque o serviço esta quase terminado."
+      ],
+      "voltar_para": "1P"
+     },
+     "registro": {
+      "categoria": "MUDANCA_NAS_CONDICOES",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    }
+   ]
+  },
+  {
+   "id": "EV07",
+   "titulo": "Colega pede para usar o mesmo ponto",
+   "modo": "1P",
+   "camera": "CAM_1P_EV07_Colega_Mesmo_Ponto",
+   "variavel_evento": "EVENTO_SEGUNDO_TRABALHADOR",
+   "peso": 2,
+   "mostrar": [
+    "NPC_EV07_Colega_Pede_Mesmo_Ponto"
+   ],
+   "falas": [
+    {
+     "quem": "COLEGA",
+     "texto": "{{NOME}}, prende o meu aqui junto com o seu."
+    },
+    {
+     "quem": "COLEGA",
+     "texto": "É só um serviço rápido."
+    }
+   ],
+   "nota": "No cenário não existe confirmação de que aquele sistema foi planejado para essa utilização.",
+   "escolhas": [
+    {
+     "id": "A",
+     "texto": "NÃO PERMITIR E PEDIR QUE ELE UTILIZE O SISTEMA PREVISTO PARA A ATIVIDADE DELE.",
+     "correta": true,
+     "ia": [
+      "Correto.",
+      "Não presuma que um ponto ou sistema pode receber outra pessoa apenas porque parece resistente.",
+      "Cada atividade precisa seguir o que foi previsto."
+     ],
+     "registro": {
+      "categoria": "PROTECAO_CONTRA_QUEDA",
+      "resultado": "CORRETO"
+     }
+    },
+    {
+     "id": "B",
+     "texto": "DEIXAR, PORQUE O PONTO PARECE FORTE.",
+     "correta": false,
+     "ia": [
+      "Você acabou de tomar uma decisão sobre algo que não foi confirmado.",
+      "Não improvise a utilização de um sistema de proteção."
+     ],
+     "retornar": true,
+     "registro": {
+      "categoria": "PROTECAO_CONTRA_QUEDA",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    },
+    {
+     "id": "C",
+     "texto": "DEIXAR APENAS POR ALGUNS MINUTOS.",
+     "correta": false,
+     "ia": [
+      "Você acabou de tomar uma decisão sobre algo que não foi confirmado.",
+      "Não improvise a utilização de um sistema de proteção."
+     ],
+     "retornar": true,
+     "registro": {
+      "categoria": "PROTECAO_CONTRA_QUEDA",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    }
+   ]
+  },
+  {
+   "id": "EV08",
+   "titulo": "Material aparece no caminho",
+   "modo": "1P",
+   "camera": "CAM_1P_EV08_Material_Na_Rota",
+   "variavel_evento": "EVENTO_OBSTACULO_NOVO",
+   "peso": 2,
+   "mostrar": [
+    "EV08_Cabo_Mangueira_Na_Rota_Saida"
+   ],
+   "ia": [
+    "{{NOME}}, esse caminho estava assim quando você chegou?"
+   ],
+   "escolhas": [
+    {
+     "id": "A",
+     "texto": "PROVIDENCIAR A RETIRADA OU ORGANIZAÇÃO ANTES DE PASSAR.",
+     "correta": true,
+     "ia": [
+      "Correto.",
+      "A obra mudou enquanto você trabalhava.",
+      "Por isso precisamos continuar observando até o final."
+     ],
+     "ocultar": [
+      "EV08_Cabo_Mangueira_Na_Rota_Saida"
+     ],
+     "registro": {
+      "categoria": "MUDANCA_NAS_CONDICOES",
+      "resultado": "CORRETO"
+     }
+    },
+    {
+     "id": "B",
+     "texto": "PASSAR POR CIMA.",
+     "correta": false,
+     "consequencia": {
+      "modo": "3P",
+      "camera": "CAM_3P_EV08_Quase_Tropeco",
+      "motivo": "mostrar a consequência da escolha",
+      "mostrar": [
+       "EV08_Cabo_Mangueira_Na_Rota_Saida",
+       "AVATAR_EV08_Quase_Tropeco"
+      ],
+      "ia": [
+       "Quase.",
+       "Se isso acontecesse próximo da área de risco, a situação seria mais seria."
+      ],
+      "voltar_para": "1P"
+     },
+     "registro": {
+      "categoria": "MUDANCA_NAS_CONDICOES",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    },
+    {
+     "id": "C",
+     "texto": "PULAR.",
+     "correta": false,
+     "consequencia": {
+      "modo": "3P",
+      "camera": "CAM_3P_EV08_Quase_Tropeco",
+      "motivo": "mostrar a consequência da escolha",
+      "mostrar": [
+       "EV08_Cabo_Mangueira_Na_Rota_Saida",
+       "AVATAR_EV08_Quase_Tropeco"
+      ],
+      "ia": [
+       "Quase.",
+       "Se isso acontecesse próximo da área de risco, a situação seria mais seria."
+      ],
+      "voltar_para": "1P"
+     },
+     "registro": {
+      "categoria": "MUDANCA_NAS_CONDICOES",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    }
+   ]
+  },
+  {
+   "id": "EV09",
+   "titulo": "Colega se sente mal",
+   "modo": "1P",
+   "camera": "CAM_1P_EV09_Colega_Tontura",
+   "variavel_evento": "EVENTO_MAL_ESTAR",
+   "peso": 2,
+   "mostrar": [
+    "NPC_EV09_Colega_Tontura"
+   ],
+   "falas": [
+    {
+     "quem": "COLEGA",
+     "texto": "Estou meio tonto."
+    },
+    {
+     "quem": "COLEGA",
+     "texto": "Já passa."
+    }
+   ],
+   "nota": "Ele está próximo de uma área onde existe risco de queda.",
+   "escolhas": [
+    {
+     "id": "A",
+     "texto": "AFASTAR O TRABALHADOR DA EXPOSIÇÃO DE FORMA SEGURA E COMUNICAR A SITUAÇÃO.",
+     "correta": true,
+     "ia": [
+      "Boa decisão.",
+      "Uma pessoa que não esta em condições de continuar não deve permanecer exposta ao risco."
+     ],
+     "ocultar": [
+      "NPC_EV09_Colega_Tontura"
+     ],
+     "registro": {
+      "categoria": "REACAO_A_SITUACOES_INESPERADAS",
+      "resultado": "CORRETO"
+     }
+    },
+    {
+     "id": "B",
+     "texto": "ELE DISSE QUE ESTÁ BEM. DEIXAR CONTINUAR.",
+     "correta": false,
+     "consequencia": {
+      "modo": "3P",
+      "camera": "CAM_3P_EV09_Colega_Desequilibrio",
+      "motivo": "mostrar a consequência da escolha",
+      "mostrar": [
+       "NPC_EV09_Colega_Desequilibrio"
+      ],
+      "ocultar": [
+       "NPC_EV09_Colega_Tontura"
+      ],
+      "congelar": true,
+      "ia": [
+       "Ele avisou que não estava se sentindo bem.",
+       "A situação precisava ter sido tratada antes de continuar."
+      ],
+      "voltar_para": "1P"
+     },
+     "registro": {
+      "categoria": "REACAO_A_SITUACOES_INESPERADAS",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    },
+    {
+     "id": "C",
+     "texto": "DAR AGUA E PEDIR PARA TERMINAR PRIMEIRO.",
+     "correta": false,
+     "consequencia": {
+      "modo": "3P",
+      "camera": "CAM_3P_EV09_Colega_Desequilibrio",
+      "motivo": "mostrar a consequência da escolha",
+      "mostrar": [
+       "NPC_EV09_Colega_Desequilibrio"
+      ],
+      "ocultar": [
+       "NPC_EV09_Colega_Tontura"
+      ],
+      "congelar": true,
+      "ia": [
+       "Ele avisou que não estava se sentindo bem.",
+       "A situação precisava ter sido tratada antes de continuar."
+      ],
+      "voltar_para": "1P"
+     },
+     "registro": {
+      "categoria": "REACAO_A_SITUACOES_INESPERADAS",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    }
+   ]
+  },
+  {
+   "id": "EV10",
+   "titulo": "Proteção foi alterada durante o intervalo",
+   "modo": "1P",
+   "camera": "CAM_1P_EV10_Protecao_Alterada",
+   "variavel_evento": "EVENTO_PROTECAO_ALTERADA",
+   "peso": 2,
+   "momento": "depois de uma pequena pausa (o jogador sai da area e volta)",
+   "mostrar": [
+    "EV10_GcR_Sul05b_Travessao_Intermediario_Removido"
+   ],
+   "ocultar": [
+    "TorreA_Pav04_GcR_Sul_05b"
+   ],
+   "ia": [
+    "{{NOME}}, você já verificou este lugar antes.",
+    "Mas passou algum tempo.",
+    "O que você faz?"
+   ],
+   "escolhas": [
+    {
+     "id": "A",
+     "texto": "CONFERIR NOVAMENTE ANTES DE RECOMECAR.",
+     "correta": true,
+     "ia": [
+      "Boa.",
+      "Verificar uma vez não significa que o local continuará igual para sempre."
+     ],
+     "registro": {
+      "categoria": "MUDANCA_NAS_CONDICOES",
+      "resultado": "CORRETO"
+     }
+    },
+    {
+     "id": "B",
+     "texto": "JÁ VERIFIQUEI ANTES. CONTINUAR.",
+     "correta": false,
+     "consequencia": {
+      "modo": "3P",
+      "camera": "CAM_3P_EV10_Protecao_Alterada",
+      "motivo": "mostrar a consequência da escolha",
+      "mostrar": [
+       "EV10_GcR_Sul05b_Travessao_Intermediario_Removido",
+       "AVATAR_TAREFA_Ajoelhado_Conectado"
+      ],
+      "ocultar": [
+       "TorreA_Pav04_GcR_Sul_05b"
+      ],
+      "ia": [
+       "A obra mudou enquanto você estava fora."
+      ],
+      "voltar_para": "1P"
+     },
+     "registro": {
+      "categoria": "MUDANCA_NAS_CONDICOES",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    }
+   ]
+  },
+  {
+   "id": "EV11",
+   "titulo": "Faz só esse último",
+   "modo": "1P",
+   "camera": "CAM_1P_EV11_Faz_So_Esse_Ultimo",
+   "variavel_evento": "EVENTO_PRESSAO_FINAL",
+   "peso": 3,
+   "momento": "servico praticamente concluido",
+   "mostrar": [
+    "NPC_PRINC_Trabalhador_Abaixo"
+   ],
+   "ocultar": [
+    "NPC_C14_Terreo_Passando_Sob_Borda"
+   ],
+   "condicao_mudou": [
+    "vento",
+    "proteção alterada",
+    "trabalhador abaixo",
+    "movimentação próxima"
+   ],
+   "falas": [
+    {
+     "quem": "ENCARREGADO",
+     "texto": "{{NOME}}, já que falta só um, termina esse último."
+    }
+   ],
+   "escolhas": [
+    {
+     "id": "A",
+     "texto": "PARAR PORQUE A CONDIÇÃO MUDOU.",
+     "correta": true,
+     "ia": [
+      "Boa decisão.",
+      "Uma atividade não se torna segura porque falta pouco."
+     ],
+     "registro": {
+      "categoria": "MUDANCA_NAS_CONDICOES",
+      "resultado": "CORRETO"
+     }
+    },
+    {
+     "id": "B",
+     "texto": "FAZER APENAS O ÚLTIMO.",
+     "correta": false,
+     "consequencia": {
+      "modo": "3P",
+      "camera": "CAM_3P_EV11_Susto",
+      "motivo": "mostrar a consequência da escolha",
+      "mostrar": [
+       "AVATAR_EV11_Susto",
+       "NPC_PRINC_Trabalhador_Abaixo"
+      ],
+      "congelar": true,
+      "ia": [
+       "Essa é uma das frases mais perigosas quando substitui uma avaliação correta.",
+       "'É só o último.'",
+       "'É rapidinho.'",
+       "'Nunca aconteceu nada.'",
+       "A condição precisa ser segura até o último segundo do trabalho."
+      ],
+      "nota": "não gerar queda - apenas um susto e congelar",
+      "voltar_para": "1P"
+     },
+     "registro": {
+      "categoria": "MUDANCA_NAS_CONDICOES",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    }
+   ]
+  },
+  {
+   "id": "EV12",
+   "titulo": "Quase acidente sem culpa do jogador",
+   "modo": "1P",
+   "camera": "CAM_1P_EV12_Quase_Acidente_Retido",
+   "variavel_evento": "EVENTO_QUASE_ACIDENTE_EXTERNO",
+   "peso": 2,
+   "sem_escolha": true,
+   "mostrar": [
+    "EV12_Fragmento_Retido_Pelo_Rodape",
+    "NPC_EV12_Pedreiro_Cortando_Bloco"
+   ],
+   "ia": [
+    "{{NOME}}, desta vez você não provocou a situação.",
+    "Mesmo assim, percebe o que aconteceu?",
+    "As medidas de proteção existentes impediram que um evento inesperado se transformasse em acidente."
+   ],
+   "consequencia_didatica": {
+    "modo": "3P",
+    "camera": "CAM_3P_EV12_Fragmento_Retido",
+    "motivo": "mostrar a consequência da escolha",
+    "mostrar": [
+     "EV12_Fragmento_Retido_Pelo_Rodape",
+     "NPC_EV12_Pedreiro_Cortando_Bloco"
+    ],
+    "ia": [
+     "Segurança não existe apenas para corrigir erros.",
+     "Ela também prepara o local para o imprevisto."
+    ],
+    "nota": "consequência POSITIVA - mostra o rodapé retendo o fragmento",
+    "voltar_para": "1P"
+   },
+   "registro_automatico": {
+    "categoria": "REACAO_A_SITUACOES_INESPERADAS",
+    "resultado": "CORRETO"
+   }
+  },
+  {
+   "id": "EV13",
+   "titulo": "Ponto de identificação não está legível",
+   "modo": "1P",
+   "camera": "CAM_1P_EV13_Identificacao_Ilegivel",
+   "variavel_evento": "EVENTO_IDENTIFICACAO_INDISPONIVEL",
+   "peso": 2,
+   "momento": "antes da conexao (substitui/antecede a C18)",
+   "mostrar": [
+    "EV13_Identificacao_PA0401_Ilegivel"
+   ],
+   "ocultar": [
+    "C18_Identificacao_PA0401_Legivel"
+   ],
+   "escolhas": [
+    {
+     "id": "A",
+     "texto": "PARAR E CONFIRMAR QUAL PONTO DEVE SER UTILIZADO.",
+     "correta": true,
+     "ia": [
+      "Correto.",
+      "Quando não tiver certeza, não adivinhe."
+     ],
+     "mostrar": [
+      "C18_Identificacao_PA0401_Legivel"
+     ],
+     "ocultar": [
+      "EV13_Identificacao_PA0401_Ilegivel"
+     ],
+     "registro": {
+      "categoria": "PROTECAO_CONTRA_QUEDA",
+      "resultado": "CORRETO"
+     }
+    },
+    {
+     "id": "B",
+     "texto": "USAR O QUE PARECE CERTO.",
+     "correta": false,
+     "ia": [
+      "Pare.",
+      "A falta de informação não é autorização para escolher por conta própria."
+     ],
+     "retornar": true,
+     "registro": {
+      "categoria": "PROTECAO_CONTRA_QUEDA",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    },
+    {
+     "id": "C",
+     "texto": "ESCOLHER O MAIS FORTE VISUALMENTE.",
+     "correta": false,
+     "ia": [
+      "Pare.",
+      "A falta de informação não é autorização para escolher por conta própria."
+     ],
+     "retornar": true,
+     "registro": {
+      "categoria": "PROTECAO_CONTRA_QUEDA",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    }
+   ]
+  },
+  {
+   "id": "EV14",
+   "titulo": "Ferramenta defeituosa",
+   "modo": "1P",
+   "camera": "CAM_1P_EV14_Ferramenta_Defeituosa",
+   "variavel_evento": "EVENTO_FERRAMENTA_DEFEITUOSA",
+   "peso": 2,
+   "mostrar": [
+    "EV14_Ferramenta_Eletrica_Cabo_Danificado",
+    "NPC_EV14_Colega_Da_Para_Terminar"
+   ],
+   "sintomas": [
+    "vibração anormal",
+    "cabo danificado percebido",
+    "funcionamento intermitente",
+    "peça solta"
+   ],
+   "falas": [
+    {
+     "quem": "COLEGA",
+     "texto": "Dá para terminar com ela."
+    }
+   ],
+   "escolhas": [
+    {
+     "id": "A",
+     "texto": "PARAR DE UTILIZAR E PROVIDENCIAR A VERIFICAÇÃO/SUBSTITUIÇÃO.",
+     "correta": true,
+     "ia": [
+      "Boa decisão.",
+      "Quando um equipamento apresenta problema, improvisar para terminar mais rápido pode criar outro risco."
+     ],
+     "ocultar": [
+      "EV14_Ferramenta_Eletrica_Cabo_Danificado"
+     ],
+     "registro": {
+      "categoria": "REACAO_A_SITUACOES_INESPERADAS",
+      "resultado": "CORRETO"
+     }
+    },
+    {
+     "id": "B",
+     "texto": "TERMINAR O SERVIÇO.",
+     "correta": false,
+     "consequencia": {
+      "modo": "3P",
+      "camera": "CAM_3P_EV14_Ferramenta_Movimento",
+      "motivo": "mostrar a consequência da escolha",
+      "mostrar": [
+       "AVATAR_EV14_Ferramenta_Tranco"
+      ],
+      "congelar": true,
+      "ia": [
+       "A ferramenta parou de repente e provocou um movimento inesperado."
+      ],
+      "nota": "sem lesão explicita",
+      "voltar_para": "1P"
+     },
+     "registro": {
+      "categoria": "REACAO_A_SITUACOES_INESPERADAS",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    },
+    {
+     "id": "C",
+     "texto": "DAR UM JEITO TEMPORÁRIO.",
+     "correta": false,
+     "consequencia": {
+      "modo": "3P",
+      "camera": "CAM_3P_EV14_Ferramenta_Movimento",
+      "motivo": "mostrar a consequência da escolha",
+      "mostrar": [
+       "AVATAR_EV14_Ferramenta_Tranco"
+      ],
+      "congelar": true,
+      "ia": [
+       "Não improvise.",
+       "A ferramenta parou de repente e provocou um movimento inesperado."
+      ],
+      "voltar_para": "1P"
+     },
+     "registro": {
+      "categoria": "REACAO_A_SITUACOES_INESPERADAS",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    }
+   ]
+  },
+  {
+   "id": "EV15",
+   "titulo": "Barulho de impacto na proteção",
+   "modo": "1P",
+   "camera": "CAM_1P_EV15_Impacto_Protecao",
+   "variavel_evento": "EVENTO_IMPACTO_PROTECAO",
+   "peso": 2,
+   "som": "CLANG!",
+   "mostrar": [
+    "EV15_GcR_Sul04b_Impacto_Sem_Dano_Aparente",
+    "EV15_Tubo_Que_Atingiu_Protecao"
+   ],
+   "ocultar": [
+    "TorreA_Pav04_GcR_Sul_04b"
+   ],
+   "escolhas": [
+    {
+     "id": "A",
+     "texto": "INTERROMPER E VERIFICAR A CONDIÇÃO DA PROTEÇÃO ANTES DE CONTINUAR.",
+     "correta": true,
+     "ia": [
+      "Correto.",
+      "Depois de um impacto, não presuma que tudo continua igual apenas porque parece normal."
+     ],
+     "mostrar": [
+      "TorreA_Pav04_GcR_Sul_04b"
+     ],
+     "ocultar": [
+      "EV15_GcR_Sul04b_Impacto_Sem_Dano_Aparente"
+     ],
+     "registro": {
+      "categoria": "REACAO_A_SITUACOES_INESPERADAS",
+      "resultado": "CORRETO"
+     }
+    },
+    {
+     "id": "B",
+     "texto": "NÃO QUEBROU. CONTINUAR.",
+     "correta": false,
+     "consequencia": {
+      "modo": "3P",
+      "camera": "CAM_3P_EV15_Protecao_Deslocada",
+      "motivo": "mostrar a consequência da escolha",
+      "mostrar": [
+       "EV15_GcR_Sul04b_Deslocado_Depois"
+      ],
+      "ocultar": [
+       "TorreA_Pav04_GcR_Sul_04b",
+       "EV15_GcR_Sul04b_Impacto_Sem_Dano_Aparente"
+      ],
+      "ia": [
+       "O impacto anterior era uma informação importante."
+      ],
+      "nota": "mostrar mais tarde: a proteção apresenta movimento",
+      "voltar_para": "1P"
+     },
+     "registro": {
+      "categoria": "REACAO_A_SITUACOES_INESPERADAS",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    }
+   ]
+  },
+  {
+   "id": "EV16",
+   "titulo": "Chuva inesperada",
+   "modo": "1P",
+   "camera": "CAM_1P_EV16_Chuva",
+   "variavel_evento": "EVENTO_CHUVA",
+   "peso": 1,
+   "mostrar": [
+    "EV16_Piso_Molhado_Chuva"
+   ],
+   "ia": [
+    "{{NOME}}, o ambiente mudou.",
+    "O que foi definido para essa situação?"
+   ],
+   "tela": {
+    "botoes": [
+     "CONSULTAR PLANEJAMENTO"
+    ]
+   },
+   "escolhas": [
+    {
+     "id": "A",
+     "texto": "CONSULTAR O PLANEJAMENTO E SEGUIR O QUE FOI DEFINIDO.",
+     "correta": true,
+     "ia": [
+      "Correto.",
+      "A condição mudou: verificamos o que foi planejado antes de decidir."
+     ],
+     "registro": {
+      "categoria": "MUDANCA_NAS_CONDICOES",
+      "resultado": "CORRETO"
+     }
+    },
+    {
+     "id": "B",
+     "texto": "CHOVEU, ENTÃO TODO TRABALHO EM ALTURA ESTÁ PROIBIDO.",
+     "correta": false,
+     "ia": [
+      "Essa regra não existe assim.",
+      "O que vale e a condição definida para esta atividade. Consulte o planejamento."
+     ],
+     "retornar": true,
+     "registro": {
+      "categoria": "MUDANCA_NAS_CONDICOES",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    },
+    {
+     "id": "C",
+     "texto": "É SÓ UMA GARUA. CONTINUAR SEM VERIFICAR.",
+     "correta": false,
+     "ia": [
+      "A condição mudou e não foi verificada.",
+      "Quando a condição muda, verifique o que foi planejado antes de continuar."
+     ],
+     "registro": {
+      "categoria": "MUDANCA_NAS_CONDICOES",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    }
+   ],
+   "regra_tecnica": "Regra 5: nunca ensinar um limite universal de vento ou chuva. O critério e o definido para a atividade.",
+   "proibido_ensinar": "CHOVEU = TODO TRABALHO EM ALTURA E PROIBIDO"
+  },
+  {
+   "id": "EV17",
+   "titulo": "Alarme de emergência da obra",
+   "modo": "1P",
+   "camera": "CAM_1P_EV17_Alarme",
+   "variavel_evento": "EVENTO_ALARME",
+   "peso": 1,
+   "mostrar": [
+    "EV17_Sirene_Alarme_Pav04",
+    "EV17_Sirenes_Canteiro",
+    "NPC_EV17_Evacuacao_01",
+    "NPC_EV17_Evacuacao_02",
+    "NPC_EV17_Evacuacao_03"
+   ],
+   "escolhas": [
+    {
+     "id": "A",
+     "texto": "SEGUIR O PROCEDIMENTO DE EMERGÊNCIA DA OBRA.",
+     "correta": true,
+     "define": {
+      "PROCEDIMENTO_EMERGENCIA_CORRETO": "SIM"
+     },
+     "ia": [
+      "Correto.",
+      "Durante uma emergência, siga o procedimento definido para o local."
+     ],
+     "registro": {
+      "categoria": "EMERGENCIA",
+      "resultado": "CORRETO"
+     }
+    },
+    {
+     "id": "B",
+     "texto": "TERMINAR O PARAFUSO PRIMEIRO.",
+     "correta": false,
+     "define": {
+      "PROCEDIMENTO_EMERGENCIA_CORRETO": "NAO"
+     },
+     "ia": [
+      "Durante uma emergência, siga o procedimento definido para o local."
+     ],
+     "retornar": true,
+     "registro": {
+      "categoria": "EMERGENCIA",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    },
+    {
+     "id": "C",
+     "texto": "ESPERAR PARA VER SE ALGUÉM CORRE.",
+     "correta": false,
+     "define": {
+      "PROCEDIMENTO_EMERGENCIA_CORRETO": "NAO"
+     },
+     "ia": [
+      "Durante uma emergência, siga o procedimento definido para o local."
+     ],
+     "retornar": true,
+     "registro": {
+      "categoria": "EMERGENCIA",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    }
+   ]
+  }
+ ],
+ "sorteio_de_eventos": {
+  "quantidade_por_sessao": [
+   3,
+   5
+  ],
+  "intervalo_minimo_entre_eventos_s": 45,
+  "regra": "o jogador precisa voltar a sentir que a situação esta normal antes de surgir outro problema",
+  "obrigatorio_sempre": [
+   "PRINC"
+  ],
+  "nao_sortear_juntos": [
+   [
+    "EVENTO_VENTO",
+    "EVENTO_CHUVA"
+   ],
+   [
+    "EVENTO_ALARME",
+    "EVENTO_MAL_ESTAR"
+   ],
+   [
+    "EVENTO_OBJETO_SUPERIOR",
+    "EVENTO_IMPACTO_PROTECAO"
+   ],
+   [
+    "EVENTO_GUARDA_CORPO_REMOVIDO",
+    "EVENTO_PROTECAO_ALTERADA"
+   ]
+  ],
+  "maximo_eventos_criticos_por_sessao": 2,
+  "condicionais": {
+   "EVENTO_INVASAO_AREA_ISOLADA": {
+    "AREA_INFERIOR_ISOLADA": "SIM"
+   }
+  },
+  "exemplos_de_execucao": [
+   [
+    "EVENTO_RADIO",
+    "EVENTO_INVASAO_AREA_ISOLADA",
+    "EVENTO_VENTO",
+    "EVENTO_GUARDA_CORPO_REMOVIDO"
+   ],
+   [
+    "EVENTO_OBJETO_SUPERIOR",
+    "EVENTO_MAL_ESTAR",
+    "EVENTO_MOVIMENTACAO_CARGA",
+    "EVENTO_PROTECAO_ALTERADA"
+   ],
+   [
+    "EVENTO_IDENTIFICACAO_INDISPONIVEL",
+    "EVENTO_FERRAMENTA_DEFEITUOSA",
+    "EVENTO_SEGUNDO_TRABALHADOR",
+    "EVENTO_ALARME"
+   ]
+  ],
+  "proporcao": "momentos normais + algumas decisões importantes + poucos eventos inesperados + consequências das escolhas"
+ },
+ "cena_principal": {
+  "id": "PRINC",
+  "titulo": "Cena principal - queda de ferramenta",
+  "modo": "1P",
+  "camera": "CAM_1P_PRINC_Chave_Escapa",
+  "maos": "MAOS_1P_PRINC_Mao_Solta_Chave",
+  "mostrar": [
+   "PRINC_Chave_Escapando_1P",
+   "MAOS_1P_PRINC_Mao_Solta_Chave"
+  ],
+  "obrigatoria": true,
+  "nota": "Independentemente dos eventos sorteados, esta consequência permanece no treinamento.",
+  "ia": [
+   "{{NOME}}, a ferramenta escapou."
+  ],
+  "resultados": [
+   {
+    "se": {
+     "FERRAMENTAS_PROTEGIDAS": "SIM"
+    },
+    "consequencia": {
+     "modo": "3P",
+     "camera": "CAM_3P_PRINC_Ferramenta_Retida",
+     "motivo": "mostrar a consequência da escolha",
+     "mostrar": [
+      "AVATAR_PRINC_Chave_Escapou",
+      "PRINC_Chave_Retida_Pelo_Cordao",
+      "C20_Ferramentas_Protegidas"
+     ],
+     "ocultar": [
+      "C20_Ferramentas_Soltas",
+      "PRINC_Chave_Escapando_1P"
+     ],
+     "ia": [
+      "{{NOME}}, a ferramenta escapou.",
+      "Mas a medida tomada antes impediu que ela caisse.",
+      "Uma decisão simples evitou uma situação perigosa."
+     ],
+     "voltar_para": "1P"
+    },
+    "registro": {
+     "categoria": "QUEDA_DE_FERRAMENTAS_E_MATERIAIS",
+     "resultado": "CORRETO"
+    }
+   },
+   {
+    "se": {
+     "FERRAMENTAS_PROTEGIDAS": "NAO",
+     "AREA_INFERIOR_ISOLADA": "SIM"
+    },
+    "consequencia": {
+     "modo": "3P",
+     "camera": "CAM_3P_PRINC_Ferramenta_Area_Isolada",
+     "motivo": "mostrar a consequência da escolha",
+     "mostrar": [
+      "C14_Area_Inferior_Isolada",
+      "C14_Barreira_Oeste_Movel",
+      "PRINC_Chave_Caida_Dentro_Area_Isolada"
+     ],
+     "ocultar": [
+      "C14_Area_Inferior_Nao_Isolada",
+      "PRINC_Chave_Escapando_1P"
+     ],
+     "ia": [
+      "A ferramenta caiu.",
+      "Ninguém estava abaixo por causa do isolamento.",
+      "Mas a queda ainda poderia ter sido evitada."
+     ],
+     "voltar_para": "1P"
+    },
+    "registro": {
+     "categoria": "QUEDA_DE_FERRAMENTAS_E_MATERIAIS",
+     "resultado": "PRECISA_MELHORAR"
+    }
+   },
+   {
+    "se": {
+     "FERRAMENTAS_PROTEGIDAS": "NAO",
+     "AREA_INFERIOR_ISOLADA": "NAO"
+    },
+    "erro_critico": true,
+    "consequencia": {
+     "modo": "3P",
+     "camera": "CAM_3P_PRINC_Ferramenta_Pessoa_Abaixo",
+     "motivo": "mostrar a consequência da escolha",
+     "mostrar": [
+      "PRINC_Chave_Caindo_Congelada_Sobre_Pessoa",
+      "NPC_PRINC_Trabalhador_Abaixo",
+      "C14_Area_Inferior_Nao_Isolada"
+     ],
+     "ocultar": [
+      "PRINC_Chave_Escapando_1P"
+     ],
+     "congelar": true,
+     "ia": [
+      "{{NOME}}, observe.",
+      "Essa situação começou antes da ferramenta cair.",
+      "Uma sequência de decisões criou uma situação que poderia causar um acidente grave."
+     ],
+     "tela": {
+      "linhas": [
+       "ÁREA ABAIXO NÃO ISOLADA",
+       "+",
+       "FERRAMENTA SEM PROTEÇÃO",
+       "=",
+       "PESSOA EXPOSTA"
+      ]
+     },
+     "nota": "silêncio total no momento do congelamento",
+     "voltar_para": "1P"
+    },
+    "registro": {
+     "categoria": "PROTECAO_DAS_PESSOAS_ABAIXO",
+     "resultado": "PRECISA_MELHORAR"
+    }
+   }
+  ],
+  "proxima": "CONC"
+ },
+ "consequencias": [
+  {
+   "id": "CONSEQ_MATERIAL_SOLTO",
+   "titulo": "Material solto",
+   "se": {
+    "MATERIAL_SOLTO": "SIM"
+   },
+   "quando": "algum tempo depois da C15, de preferência junto de uma rajada de vento",
+   "consequencia": {
+    "modo": "3P",
+    "camera": "CAM_3P_CONSEQ_Material_Solto",
+    "motivo": "mostrar a consequência da escolha",
+    "mostrar": [
+     "CONSEQ_Material_Solto_Caindo_Congelado",
+     "NPC_PRINC_Trabalhador_Abaixo"
+    ],
+    "congelar": true,
+    "ia": [
+     "Lembra daquele material que parecia não oferecer problema?",
+     "Ele acabou de se mover."
+    ],
+    "voltar_para": "1P"
+   },
+   "variantes": [
+    {
+     "se": {
+      "AREA_INFERIOR_ISOLADA": "SIM"
+     },
+     "mostrar": [
+      "CONSEQ_Material_Solto_No_Chao",
+      "C14_Area_Inferior_Isolada"
+     ],
+     "ocultar": [
+      "NPC_PRINC_Trabalhador_Abaixo"
+     ],
+     "ia": [
+      "Ninguém foi atingido por causa do isolamento."
+     ]
+    },
+    {
+     "se": {
+      "AREA_INFERIOR_ISOLADA": "NAO"
+     },
+     "mostrar": [
+      "NPC_PRINC_Trabalhador_Abaixo"
+     ],
+     "ia": [
+      "Uma pessoa ficou exposta."
+     ],
+     "erro_critico": true
+    }
+   ],
+   "registro": {
+    "categoria": "QUEDA_DE_FERRAMENTAS_E_MATERIAIS",
+    "resultado": "PRECISA_MELHORAR"
+   }
+  },
+  {
+   "id": "CONSEQ_MATERIAL_RETIRADO",
+   "titulo": "Consequência positiva - material retirado da borda",
+   "se": {
+    "MATERIAL_SOLTO": "NAO"
+   },
+   "positiva": true,
+   "quando": "quando o vento aumentar (EV06) ou perto da organização final",
+   "consequencia": {
+    "modo": "3P",
+    "camera": "CAM_3P_CONSEQ_Material_Retirado_Positivo",
+    "motivo": "mostrar a consequência da escolha",
+    "mostrar": [
+     "EV06_Lona_Batendo_Poeira",
+     "C15_Madeira_Retirada_Guardada"
+    ],
+    "ocultar": [
+     "C17_Lona_Cobrindo_Material"
+    ],
+    "ia": [
+     "{{NOME}}, lembra do material que você retirou daqui?",
+     "Com esse vento, ele poderia ter sido deslocado."
+    ],
+    "voltar_para": "1P"
+   }
+  },
+  {
+   "id": "CONSEQ_ABERTURA_IGNORADA",
+   "titulo": "Abertura ignorada",
+   "se": {
+    "ABERTURA_IGNORADA": "SIM"
+   },
+   "quando": "durante o retorno, ao passar pelo 3o pavimento",
+   "consequencia": {
+    "modo": "3P",
+    "camera": "CAM_3P_C11_Conseq_Abertura_Ignorada",
+    "motivo": "mostrar a consequência da escolha",
+    "mostrar": [
+     "NPC_CONSEQ_Pav03_Trabalhador_Carregando",
+     "C11_Pav03_Abertura_Protecao_Deslocada"
+    ],
+    "congelar": true,
+    "ia": [
+     "{{NOME}}, lembra deste local?",
+     "Você decidiu continuar porque não era sua área.",
+     "Agora outro trabalhador esta exposto.",
+     "Um risco não deixa de existir porque pertence ao serviço de outra pessoa."
+    ],
+    "voltar_para": "1P"
+   },
+   "registro": {
+    "categoria": "ABERTURAS_E_PROTECOES",
+    "resultado": "PRECISA_MELHORAR"
+   },
+   "erro_critico": true
+  },
+  {
+   "id": "CONSEQ_CONEXAO_INCORRETA",
+   "titulo": "Conexão incorreta",
+   "se": {
+    "CONEXAO_INCORRETA": "SIM"
+   },
+   "quando": "em uma situação de desequilíbrio, quando o sistema e exigido",
+   "consequencia": {
+    "modo": "3P",
+    "camera": "CAM_3P_CONSEQ_Conexao_Incorreta",
+    "motivo": "mostrar a consequência da escolha",
+    "congelar": true,
+    "ia": [
+     "{{NOME}}, você acreditava estar protegido.",
+     "Mas o local escolhido não fazia parte do sistema previsto.",
+     "Não escolha um ponto porque ele parece forte.",
+     "Utilize o que foi definido para a atividade."
+    ],
+    "voltar_para": "1P"
+   },
+   "variantes_por_ponto": {
+    "TUBULACAO": {
+     "mostrar": [
+      "AVATAR_CONSEQ_Conexao_Incorreta_Tubulacao",
+      "CONSEQ_Conexao_Tubulacao_Cedendo"
+     ]
+    },
+    "VERGALHAO": {
+     "mostrar": [
+      "AVATAR_CONSEQ_Conexao_Incorreta_Vergalhao",
+      "CONSEQ_Conexao_Vergalhao_Dobrando"
+     ]
+    },
+    "ESTRUTURA_METALICA": {
+     "mostrar": [
+      "AVATAR_CONSEQ_Conexao_Incorreta_EstruturaMetalica",
+      "CONSEQ_Conexao_Estrutura_Metalica_Deslizando"
+     ]
+    },
+    "GUARDA_CORPO": {
+     "camera": "CAM_3P_CONSEQ_Guarda_Corpo_Problema",
+     "mostrar": [
+      "AVATAR_CONSEQ_Conexao_Incorreta_GuardaCorpo",
+      "CONSEQ_Conexao_GuardaCorpo_Cedendo"
+     ]
+    }
+   },
+   "registro": {
+    "categoria": "PROTECAO_CONTRA_QUEDA",
+    "resultado": "PRECISA_MELHORAR"
+   },
+   "erro_critico": true
+  },
+  {
+   "id": "CONSEQ_EQUIPAMENTO_DANIFICADO",
+   "titulo": "Equipamento danificado",
+   "se_qualquer": [
+    {
+     "CINTURAO_DANIFICADO": "SIM"
+    },
+    {
+     "TALABARTE_DANIFICADO": "SIM"
+    }
+   ],
+   "quando": "durante uma queda simulada, quando o equipamento e exigido",
+   "consequencia": {
+    "modo": "3P",
+    "camera": "CAM_3P_CONSEQ_Equipamento_Danificado",
+    "motivo": "mostrar a consequência da escolha",
+    "congelar": true,
+    "ia": [
+     "Lembra do dano encontrado antes de subir?",
+     "O problema não desapareceu quando você decidiu continuar.",
+     "O equipamento está sendo exigido justamente agora.",
+     "Equipamento danificado deve ser retirado de uso."
+    ],
+    "voltar_para": "1P"
+   },
+   "variantes": [
+    {
+     "se": {
+      "CINTURAO_DANIFICADO": "SIM"
+     },
+     "mostrar": [
+      "AVATAR_CONSEQ_Cinturao_Danificado"
+     ]
+    },
+    {
+     "se": {
+      "TALABARTE_DANIFICADO": "SIM"
+     },
+     "mostrar": [
+      "AVATAR_CONSEQ_Talabarte_Danificado"
+     ]
+    }
+   ],
+   "registro": {
+    "categoria": "INSPECAO_DOS_EQUIPAMENTOS",
+    "resultado": "PRECISA_MELHORAR"
+   },
+   "erro_critico": true
+  },
+  {
+   "id": "CONSEQ_GUARDA_CORPO_PROBLEMA",
+   "titulo": "Guarda-corpo com problema não comunicado",
+   "se": {
+    "GUARDA_CORPO_PROBLEMA": "SIM"
+   },
+   "quando": "quando o jogador se apoiar ou encostar no trecho solto",
+   "consequencia": {
+    "modo": "3P",
+    "camera": "CAM_3P_CONSEQ_Guarda_Corpo_Problema",
+    "motivo": "mostrar a consequência da escolha",
+    "mostrar": [
+     "CONSEQ_GcR_Sul05a_Cedendo",
+     "C13_GcR_Sul05a_Levemente_Solto"
+    ],
+    "ocultar": [
+     "TorreA_Pav04_GcR_Sul_05a"
+    ],
+    "congelar": true,
+    "ia": [
+     "Aquele trecho que parecia estar de pé cedeu.",
+     "Uma proteção não precisa estar caída para apresentar um problema."
+    ],
+    "voltar_para": "1P"
+   },
+   "registro": {
+    "categoria": "ABERTURAS_E_PROTECOES",
+    "resultado": "PRECISA_MELHORAR"
+   },
+   "erro_critico": true
+  },
+  {
+   "id": "CONSEQ_COMUNICACAO_RESTABELECIDA",
+   "titulo": "Consequência positiva - comunicação restabelecida",
+   "se": {
+    "COMUNICACAO_FUNCIONANDO": "SIM"
+   },
+   "positiva": true,
+   "requer_evento": "EVENTO_RADIO",
+   "quando": "quando surgir uma situação que exija comunicação",
+   "ia": [
+    "Agora você esta vendo por que restabelecer a comunicação foi importante."
+   ]
+  },
+  {
+   "id": "CONSEQ_ISOLAMENTO_FUNCIONOU",
+   "titulo": "Consequência positiva - o isolamento funcionou",
+   "se": {
+    "AREA_INFERIOR_ISOLADA": "SIM"
+   },
+   "positiva": true,
+   "quando": "quando uma peça cair inesperadamente (PRINC ou EV02)",
+   "ia": [
+    "O isolamento funcionou exatamente quando foi necessário."
+   ]
+  }
+ ],
+ "fechamento": [
+  {
+   "id": "CONC",
+   "titulo": "Conclusão da tarefa",
+   "modo": "1P",
+   "camera": "CAM_1P_CONC_Suporte_Instalado",
+   "maos": "MAOS_1P_C21_Chave",
+   "mostrar": [
+    "CONC_Suporte_Instalado",
+    "MAOS_1P_C21_Chave"
+   ],
+   "ocultar": [
+    "C21_Suporte_Aguardando"
+   ],
+   "ia": [
+    "{{NOME}}, serviço concluido.",
+    "Mas terminar a tarefa não significa simplesmente pegar suas coisas e ir embora.",
+    "Deixe a área segura para quem vier depois."
+   ],
+   "proxima": "ORG"
+  },
+  {
+   "id": "ORG",
+   "titulo": "Organização final",
+   "modo": "1P",
+   "camera": "CAM_1P_ORG_Organizacao_Final",
+   "mostrar": [
+    "ORG_Sobras_Ferramentas_Apos_Servico",
+    "CONC_Suporte_Instalado"
+   ],
+   "gatilho": "TRG_ORG_Saida_Frente",
+   "lista_verificacao": [
+    "recolher ferramentas",
+    "retirar materiais",
+    "conferir se nada ficou próximo à borda",
+    "verificar o caminho de saída",
+    "observar as proteções",
+    "comunicar a conclusão"
+   ],
+   "escolhas": [
+    {
+     "id": "A",
+     "texto": "RECOLHER TUDO E COMUNICAR A CONCLUSÃO.",
+     "correta": true,
+     "ia": [
+      "Boa.",
+      "A área fica segura para quem vier depois."
+     ],
+     "mostrar": [
+      "AVATAR_ORG_Recolhendo_Ferramentas"
+     ],
+     "ocultar": [
+      "ORG_Sobras_Ferramentas_Apos_Servico"
+     ],
+     "registro": {
+      "categoria": "OBSERVACAO_DO_CANTEIRO",
+      "resultado": "CORRETO"
+     }
+    },
+    {
+     "id": "B",
+     "texto": "SAIR DEIXANDO O MATERIAL.",
+     "correta": false,
+     "ia": [
+      "Observe novamente.",
+      "Seu serviço terminou.",
+      "O risco que você deixar aqui continuará para outra pessoa."
+     ],
+     "retornar": true,
+     "registro": {
+      "categoria": "OBSERVACAO_DO_CANTEIRO",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    }
+   ],
+   "proxima": "RET"
+  },
+  {
+   "id": "RET",
+   "titulo": "Retorno",
+   "modo": "1P",
+   "camera": "CAM_1P_RET_Descendo_Escada",
+   "rota": "R08_Retorno_Terreo",
+   "gatilho": "TRG_RET_Terreo_Saida",
+   "cameras_extra": [
+    "CAM_1P_RET_Chegada_Terreo"
+   ],
+   "ia": [
+    "O trabalhador retorna pelo acesso previsto e desce até o térreo."
+   ],
+   "consequencias_pendentes": [
+    "CONSEQ_ABERTURA_IGNORADA"
+   ],
+   "proxima": "EMERG"
+  },
+  {
+   "id": "EMERG",
+   "titulo": "Última situação - emergência",
+   "modo": "1P",
+   "camera": "CAM_1P_EMERG_Trabalhador_Suspenso",
+   "maos": "MAOS_1P_EMERG_Radio",
+   "mostrar": [
+    "NPC_EMERG_Trabalhador_Suspenso",
+    "EMERG_Ancoragem_Kit_Isolamento_Resgate"
+   ],
+   "gatilho": "TRG_EMERG_Observacao",
+   "som": "alarme",
+   "ia": [
+    "{{NOME}}, um trabalhador sofreu uma queda.",
+    "Ele está suspenso.",
+    "O que você faz?"
+   ],
+   "escolhas": [
+    {
+     "id": "A",
+     "texto": "ACIONAR O PROCEDIMENTO DE EMERGÊNCIA E A EQUIPE PREPARADA PARA O RESGATE.",
+     "correta": true,
+     "define": {
+      "PROCEDIMENTO_EMERGENCIA_CORRETO": "SIM"
+     },
+     "mostrar": [
+      "MAOS_1P_EMERG_Radio"
+     ],
+     "consequencia": {
+      "modo": "3P",
+      "camera": "CAM_3P_EMERG_A_Equipe_Resgate",
+      "motivo": "mostrar a consequência da escolha",
+      "mostrar": [
+       "NPC_EMERG_Trabalhador_Suspenso",
+       "NPC_EMERG_Resgate_01_Borda",
+       "NPC_EMERG_Resgate_02_Radio",
+       "NPC_EMERG_Resgate_03_Chegando",
+       "AVATAR_EMERG_A_Radio"
+      ],
+      "ia": [
+       "Correto.",
+       "Um resgate em altura também possui riscos.",
+       "Ele precisa seguir o procedimento definido.",
+       "O objetivo e ajudar a vítima sem criar uma segunda vítima."
+      ],
+      "voltar_para": "1P"
+     },
+     "registro": {
+      "categoria": "EMERGENCIA",
+      "resultado": "CORRETO"
+     },
+     "falas": [
+      {
+       "quem": "TRABALHADOR",
+       "texto": "Emergência em trabalho em altura."
+      },
+      {
+       "quem": "TRABALHADOR",
+       "texto": "Trabalhador suspenso."
+      },
+      {
+       "quem": "TRABALHADOR",
+       "texto": "Acionando procedimento de emergência."
+      }
+     ]
+    },
+    {
+     "id": "B",
+     "texto": "SUBIR SOZINHO PARA TENTAR PUXA-LO.",
+     "correta": false,
+     "define": {
+      "PROCEDIMENTO_EMERGENCIA_CORRETO": "NAO"
+     },
+     "retornar": true,
+     "consequencia": {
+      "modo": "3P",
+      "camera": "CAM_3P_EMERG_B_Subir_Sozinho",
+      "motivo": "mostrar a consequência da escolha",
+      "mostrar": [
+       "NPC_EMERG_Trabalhador_Suspenso",
+       "AVATAR_EMERG_B_Subindo_Escada"
+      ],
+      "congelar": true,
+      "ia": [
+       "Pare, {{NOME}}.",
+       "Entrar sem preparo pode transformar você em outra vítima."
+      ],
+      "voltar_para": "1P"
+     },
+     "registro": {
+      "categoria": "EMERGENCIA",
+      "resultado": "PRECISA_MELHORAR"
+     },
+     "erro_critico": true
+    },
+    {
+     "id": "C",
+     "texto": "PEDIR PARA QUALQUER PESSOA AJUDAR.",
+     "correta": false,
+     "define": {
+      "PROCEDIMENTO_EMERGENCIA_CORRETO": "NAO"
+     },
+     "retornar": true,
+     "consequencia": {
+      "modo": "3P",
+      "camera": "CAM_3P_EMERG_C_Qualquer_Pessoa",
+      "motivo": "mostrar a consequência da escolha",
+      "mostrar": [
+       "NPC_EMERG_Trabalhador_Suspenso",
+       "NPC_EMERG_C_Pessoa_Nao_Preparada"
+      ],
+      "ia": [
+       "Nem todo trabalhador esta preparado para executar um resgate em altura."
+      ],
+      "voltar_para": "1P"
+     },
+     "registro": {
+      "categoria": "EMERGENCIA",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    },
+    {
+     "id": "D",
+     "texto": "APENAS CHAMAR UMA AMBULÂNCIA.",
+     "correta": false,
+     "define": {
+      "PROCEDIMENTO_EMERGENCIA_CORRETO": "NAO"
+     },
+     "retornar": true,
+     "consequencia": {
+      "modo": "3P",
+      "camera": "CAM_3P_EMERG_D_Aguardando",
+      "motivo": "mostrar a consequência da escolha",
+      "mostrar": [
+       "NPC_EMERG_Trabalhador_Suspenso"
+      ],
+      "ia": [
+       "O atendimento médico pode ser necessário.",
+       "Mas o trabalhador esta suspenso e existe um procedimento preparado para essa situação.",
+       "Acione a resposta prevista."
+      ],
+      "voltar_para": "1P"
+     },
+     "registro": {
+      "categoria": "EMERGENCIA",
+      "resultado": "PRECISA_MELHORAR"
+     }
+    }
+   ],
+   "proxima": "RELATORIO"
+  }
+ ],
+ "relatorio": {
+  "cabecalho": [
+   "TRABALHADOR",
+   "{{NOME}}"
+  ],
+  "escala": [
+   "CORRETO",
+   "PRECISA_MELHORAR"
+  ],
+  "categorias": [
+   "AUTORIZACAO",
+   "PLANEJAMENTO",
+   "INSPECAO_DOS_EQUIPAMENTOS",
+   "ACESSO",
+   "OBSERVACAO_DO_CANTEIRO",
+   "ABERTURAS_E_PROTECOES",
+   "PROTECAO_CONTRA_QUEDA",
+   "QUEDA_DE_FERRAMENTAS_E_MATERIAIS",
+   "PROTECAO_DAS_PESSOAS_ABAIXO",
+   "REACAO_A_SITUACOES_INESPERADAS",
+   "MUDANCA_NAS_CONDICOES",
+   "COMUNICACAO",
+   "EMERGENCIA"
+  ],
+  "regra": "não mostrar somente uma nota - mostrar comportamento por categoria"
+ },
+ "resultados": [
+  {
+   "id": "BOM_DESEMPENHO",
+   "condicao": "nenhum erro crítico e no máximo 2 categorias em PRECISA_MELHORAR",
+   "ia": [
+    "Parabens, {{NOME}}.",
+    "Você concluiu a atividade tomando boas decisões.",
+    "Mas o mais importante não foi decorar respostas.",
+    "Foi perceber quando alguma coisa deixou de estar certa.",
+    "Uma obra muda o tempo todo.",
+    "Observe.",
+    "Pense.",
+    "Não improvise.",
+    "E quando alguma condição deixar de ser segura, pare e comunique."
+   ]
+  },
+  {
+   "id": "PONTOS_A_MELHORAR",
+   "condicao": "nenhum erro crítico e 3 ou mais categorias em PRECISA_MELHORAR",
+   "ia": [
+    "{{NOME}}, você concluiu o serviço, mas algumas decisões precisam ser revistas.",
+    "Observe o que aconteceu depois de cada escolha.",
+    "Em alguns casos, o problema apareceu vários minutos depois.",
+    "É exatamente por isso que precisamos pensar antes de agir."
+   ],
+   "botoes": [
+    "REVISAR MINHAS DECISÕES"
+   ]
+  },
+  {
+   "id": "ERROS_CRITICOS",
+   "condicao": "pelo menos uma escolha marcada como erro_critico",
+   "ia": [
+    "{{NOME}}, algumas decisões poderiam causar um acidente grave.",
+    "Antes de concluir o treinamento, você deverá repetir essas situações.",
+    "Não tente apenas escolher outra resposta.",
+    "Observe o ambiente e entenda por que aquela decisão não era segura."
+   ],
+   "botoes": [
+    "REFAZER SITUAÇÕES CRITICAS"
+   ]
+  }
+ ],
+ "final": {
+  "ia": [
+   "{{NOME}}, chegamos ao final da atividade.",
+   "Hoje nem tudo aconteceu como planejado.",
+   "E essa é justamente uma das principais lições.",
+   "Uma obra muda.",
+   "Pessoas circulam.",
+   "Materiais mudam de lugar.",
+   "Outras equipes começam serviços.",
+   "O tempo pode mudar.",
+   "Um equipamento pode apresentar problema.",
+   "Uma proteção pode ser alterada.",
+   "Você não controla tudo o que acontece ao seu redor.",
+   "Mas pode controlar a forma como reage.",
+   "Observe.",
+   "Pense antes de agir.",
+   "Não improvise.",
+   "Proteja você e também quem trabalha ao seu redor.",
+   "E quando alguma coisa deixar de estar segura, pare e comunique.",
+   "Segurança não é trabalhar devagar.",
+   "É trabalhar sabendo quando continuar e quando parar.",
+   "Parabens por concluir o treinamento."
+  ],
+  "tela": {
+   "titulo": "TREINAMENTO CONCLUIDO",
+   "campos": [
+    [
+     "TRABALHADOR",
+     "{{NOME}}"
+    ]
+   ],
+   "botoes": [
+    "VER MEU RESULTADO",
+    "VER MINHAS DECISÕES",
+    "REVISAR SITUAÇÕES DE RISCO",
+    "REFAZER SITUAÇÕES CRITICAS",
+    "REFAZER TREINAMENTO",
+    "FINALIZAR"
+   ]
+  }
+ },
+ "regras_tecnicas": [
+  "Não ensinar o trabalhador a projetar um sistema de proteção contra quedas.",
+  "O sistema utilizado no cenário deve ser previamente definido.",
+  "Não tratar tubulação, vergalhão ou guarda-corpo como ponto de ancoragem por padrão.",
+  "Não ensinar medidas universais de ajuste de equipamentos quando dependem do fabricante.",
+  "Não inventar um limite universal de vento ou chuva.",
+  "As condições que exigem interrupção devem estar definidas para o cenário.",
+  "Não apresentar qualquer escada encontrada na obra como meio adequado de acesso.",
+  "Proteções coletivas não devem ser retiradas ou alteradas pelo jogador como improvisação.",
+  "Aberturas no piso devem aparecer devidamente protegidas quando corretas.",
+  "Não permitir que a ausência de acidente transforme uma escolha insegura em escolha correta.",
+  "Um 'quase acidente' também deve gerar reflexão quando revelar uma condição perigosa.",
+  "Se uma situação não estiver prevista ou tiver mudado de forma relevante, a resposta padrão não deve ser 'improvise'; deve envolver interromper, comunicar e reavaliar.",
+  "Trabalhos simultâneos precisam ser considerados quando um puder interferir no outro.",
+  "O risco de queda de materiais e ferramentas deve fazer parte do cenário.",
+  "Emergência e resgate devem existir no planejamento antes da atividade.",
+  "O jogador não deve ser ensinado a executar sozinho um resgate especializado apenas porque viu uma animação.",
+  "Pessoas responsáveis e capacitadas devem executar as ações específicas que exigem essa qualificação."
+ ],
+ "principios": [
+  "Não transformar o treinamento em pegadinha: toda decisão precisa ter informação suficiente no cenário.",
+  "Nem tudo no cenário representa um risco - o trabalhador precisa realmente observar.",
+  "Mostrar também as consequências positivas das boas decisões.",
+  "Não exagerar: a maior parte da atividade deve acontecer normalmente.",
+  "Ao repetir o treinamento, os eventos não devem acontecer sempre na mesma ordem.",
+  "Escolha -> consequência -> motivo."
+ ]
+}

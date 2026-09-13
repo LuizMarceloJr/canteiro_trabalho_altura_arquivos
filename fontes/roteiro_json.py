@@ -1,0 +1,1137 @@
+# -*- coding: utf-8 -*-
+"""roteiro_json.py - gera roteiro_treinamento.json a partir do roteiro do PDF,
+apontando para as cameras / objetos / variantes que existem no .blend e no .glb.
+
+Convencao do treinamento:
+  * TODAS as cenas sao em 1a pessoa (CAM_1P_*).
+  * A camera so vai para 3a pessoa (CAM_3P_*) para MOSTRAR A CONSEQUENCIA de uma escolha
+    (e na Cena 07, onde o proprio roteiro pede 3a pessoa para conferir o cinturao vestido).
+"""
+import json, os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import acentos
+
+N = "{{NOME}}"
+
+# ---------------------------------------------------------------- categorias do relatorio
+CAT = dict(
+    AUT="AUTORIZACAO", PLAN="PLANEJAMENTO", INSP="INSPECAO_DOS_EQUIPAMENTOS", ACES="ACESSO",
+    OBS="OBSERVACAO_DO_CANTEIRO", ABER="ABERTURAS_E_PROTECOES", QUED="PROTECAO_CONTRA_QUEDA",
+    FERR="QUEDA_DE_FERRAMENTAS_E_MATERIAIS", ABX="PROTECAO_DAS_PESSOAS_ABAIXO",
+    INES="REACAO_A_SITUACOES_INESPERADAS", MUD="MUDANCA_NAS_CONDICOES", COM="COMUNICACAO", EMG="EMERGENCIA")
+
+
+def esc(id, texto, correta=False, define=None, ia=None, retornar=False, conseq=None,
+        registro=None, tela=None, mostrar=None, ocultar=None, critica=False, **extra):
+    d = {"id": id, "texto": texto, "correta": bool(correta)}
+    if define:
+        d["define"] = define
+    if ia:
+        d["ia"] = ia
+    if tela:
+        d["tela"] = tela
+    if mostrar:
+        d["mostrar"] = mostrar
+    if ocultar:
+        d["ocultar"] = ocultar
+    if retornar:
+        d["retornar"] = True          # volta para a mesma pergunta (nao avanca)
+    if conseq:
+        d["consequencia"] = conseq
+    if registro:
+        d["registro"] = {"categoria": registro[0], "resultado": registro[1]}
+    if critica:
+        d["erro_critico"] = True
+    d.update(extra)
+    return d
+
+
+def c3p(camera, ia=None, mostrar=None, ocultar=None, congelar=False, tela=None, nota=None):
+    """bloco de 3a pessoa - unico momento em que a camera sai da 1a pessoa."""
+    d = {"modo": "3P", "camera": camera, "motivo": "mostrar a consequencia da escolha"}
+    if mostrar:
+        d["mostrar"] = mostrar
+    if ocultar:
+        d["ocultar"] = ocultar
+    if congelar:
+        d["congelar"] = True
+    if ia:
+        d["ia"] = ia
+    if tela:
+        d["tela"] = tela
+    if nota:
+        d["nota"] = nota
+    d["voltar_para"] = "1P"
+    return d
+
+
+def cena(id, titulo, camera, **kw):
+    d = {"id": id, "titulo": titulo, "modo": "1P", "camera": camera}
+    d.update(kw)
+    return d
+
+
+# ================================================================= CENAS 01 a 21
+CENAS = [
+ cena("C01", "Entrada no canteiro", "CAM_1P_C01_Entrada_Canteiro",
+   ambiente="pessoas circulando, caminhao descarregando ao fundo, som de obra; a camera olha para o 4o pavimento",
+   ia=["Ola, %s." % N,
+       "Hoje voce realizara uma atividade no quarto pavimento desta obra.",
+       "Seu servico sera ajustar e fixar um suporte proximo a borda da laje.",
+       "Mas existe uma diferenca neste treinamento.",
+       "Eu nao vou simplesmente dizer tudo o que voce precisa fazer.",
+       "Voce devera observar o ambiente e tomar decisoes.",
+       "Algumas escolhas terao consequencia imediatamente.",
+       "Outras poderao mostrar seus efeitos somente depois.",
+       "E algumas situacoes poderao acontecer quando voce menos esperar.",
+       "Nao tenha pressa.",
+       "Seu objetivo nao e apenas terminar o servico.",
+       "Seu objetivo e terminar com seguranca."],
+   tela={"titulo": "MISSAO", "linhas": ["AJUSTAR E FIXAR O SUPORTE NO QUARTO PAVIMENTO."], "botoes": ["INICIAR"]},
+   proxima="C02"),
+
+ cena("C02", "Estou liberado para realizar o servico?", "CAM_1P_C02_Encarregado",
+   mostrar=["NPC_C02_Encarregado_Conversando"],
+   falas=[{"quem": "ENCARREGADO", "texto": "Bom dia, %s." % N},
+          {"quem": "ENCARREGADO", "texto": "Precisamos terminar aquele suporte."},
+          {"quem": "ENCARREGADO", "texto": "O pessoal da proxima etapa ja esta esperando."}],
+   ia=["%s, antes de subir, confirme se voce esta liberado para realizar esse trabalho." % N],
+   escolhas=[
+     esc("A", "VERIFICAR MINHA LIBERACAO.", correta=True, define={"TRABALHADOR_AUTORIZADO": "SIM"},
+         tela={"titulo": "LIBERACAO", "linhas": ["TREINAMENTO - OK", "APTIDAO - OK", "AUTORIZACAO - OK"]},
+         ia=["Correto.", "Experiencia ajuda, mas nao substitui a liberacao necessaria para realizar o trabalho.",
+             "Voce esta autorizado."],
+         registro=(CAT["AUT"], "CORRETO")),
+     esc("B", "JA TRABALHO EM OBRA HA MUITO TEMPO. POSSO SUBIR.", retornar=True,
+         ia=["Cuidado, %s." % N,
+             "Ter experiencia nao significa estar automaticamente liberado para qualquer trabalho em altura.",
+             "Confirme sua liberacao antes de continuar."],
+         registro=(CAT["AUT"], "PRECISA_MELHORAR")),
+     esc("C", "MEU COLEGA ESTA LIBERADO. POSSO IR COM ELE.", retornar=True,
+         ia=["A autorizacao do seu colega nao vale para voce.",
+             "Cada trabalhador precisa estar liberado para a atividade que vai realizar."],
+         registro=(CAT["AUT"], "PRECISA_MELHORAR"))],
+   proxima="C03"),
+
+ cena("C03", "Precisa mesmo existir exposicao a altura?", "CAM_1P_C03_Observar_Predio",
+   ia=["%s, existe outra pergunta antes de simplesmente colocar o cinturao." % N,
+       "Existe uma maneira segura de realizar esse servico sem expor alguem ao risco de queda?"],
+   escolhas=[
+     esc("A", "VERIFICAR OUTRAS FORMAS DE REALIZAR O SERVICO.", correta=True,
+         tela={"titulo": "ALTERNATIVAS AVALIADAS",
+               "linhas": ["REALIZAR DO PISO INFERIOR - NAO E POSSIVEL.",
+                          "UTILIZAR FERRAMENTA DE ALCANCE - NAO E POSSIVEL.",
+                          "REALIZAR POR OUTRO LOCAL - NAO E POSSIVEL."]},
+         ia=["Boa decisao.", "Se podemos evitar expor alguem ao risco, essa deve ser nossa primeira preocupacao.",
+             "Neste caso, o servico precisa realmente ser executado no quarto pavimento.", "Vamos continuar."],
+         registro=(CAT["PLAN"], "CORRETO")),
+     esc("B", "COLOCAR O CINTURAO E SUBIR.",
+         ia=["Existe uma etapa antes disso.", "Primeiro verificamos se e possivel evitar a exposicao.",
+             "Neste caso nao e possivel.", "Agora podemos continuar o planejamento."],
+         registro=(CAT["PLAN"], "PRECISA_MELHORAR")),
+     esc("C", "SUBIR PRIMEIRO E ANALISAR LA EM CIMA.",
+         ia=["Existe uma etapa antes disso.", "Primeiro verificamos se e possivel evitar a exposicao.",
+             "Neste caso nao e possivel.", "Agora podemos continuar o planejamento."],
+         registro=(CAT["PLAN"], "PRECISA_MELHORAR"))],
+   proxima="C04"),
+
+ cena("C04", "Planejamento", "CAM_1P_C04_Encarregado_Tablet",
+   mostrar=["NPC_C04_Encarregado_Entrega_Tablet"], ocultar=["NPC_C02_Encarregado_Conversando"],
+   falas=[{"quem": "ENCARREGADO", "texto": "Fizeram praticamente o mesmo servico no terceiro andar na semana passada."},
+          {"quem": "ENCARREGADO", "texto": "Deve estar tudo igual."}],
+   ia=["%s, uma obra muda constantemente." % N, "Vamos verificar o planejamento preparado para o servico de hoje."],
+   escolhas=[
+     esc("A", "CONFERIR A ANALISE DE RISCO E A PERMISSAO DE TRABALHO ATUAL.", correta=True,
+         define={"DOCUMENTACAO_VERIFICADA": "SIM"}, mostrar=["MAOS_1P_C05_Tablet_Permissao"],
+         ia=["Correto.", "Um servico parecido nao significa que as condicoes continuam iguais."],
+         registro=(CAT["PLAN"], "CORRETO")),
+     esc("B", "USAR A DOCUMENTACAO DA SEMANA PASSADA.", retornar=True,
+         define={"DOCUMENTACAO_VERIFICADA": "NAO"}, mostrar=["MAOS_1P_C04_Tablet_Semana_Passada"],
+         ia=["Esse documento pertence a outro servico.", "Materiais mudam de lugar.", "Protecoes podem mudar.",
+             "Outras equipes podem comecar atividades.", "Vamos conferir o servico atual."],
+         registro=(CAT["PLAN"], "PRECISA_MELHORAR")),
+     esc("C", "O ENCARREGADO JA AUTORIZOU. POSSO COMECAR.", retornar=True,
+         ia=["A autorizacao verbal nao substitui o planejamento necessario para essa atividade."],
+         registro=(CAT["PLAN"], "PRECISA_MELHORAR"))],
+   proxima="C05"),
+
+ cena("C05", "Informacoes do servico", "CAM_1P_C05_Tablet_Informacoes",
+   maos="MAOS_1P_C05_Tablet_Permissao", mostrar=["MAOS_1P_C05_Tablet_Permissao"],
+   tela={"titulo": "PERMISSAO DE TRABALHO + ANALISE DE RISCO",
+         "campos": [["LOCAL", "QUARTO PAVIMENTO."], ["ATIVIDADE", "FIXACAO DE SUPORTE."],
+                    ["ACESSO", "ESCADA INTERNA PREVISTA."], ["PROTECAO DA PERIFERIA", "GUARDA-CORPO."],
+                    ["AREA DE EXECUCAO", "UTILIZAR SISTEMA DE PROTECAO DEFINIDO PARA A ATIVIDADE."],
+                    ["AREA ABAIXO", "MANTER ISOLADA."], ["FERRAMENTAS", "PROTEGER CONTRA QUEDA."],
+                    ["COMUNICACAO", "RADIO."], ["CONDICOES DO AMBIENTE", "VERIFICAR ANTES E DURANTE A ATIVIDADE."],
+                    ["EMERGENCIA", "ACIONAR PROCEDIMENTO DEFINIDO PARA A OBRA."]]},
+   ia=["%s, nao precisa decorar isso." % N, "Voce precisa verificar se o que foi planejado realmente existe no local."],
+   nota="Esta tela pode ser reaberta a qualquer momento (botao CONSULTAR PLANEJAMENTO) - e usada no EV16.",
+   proxima="C06"),
+
+ cena("C06", "Escolha e inspecao dos equipamentos", "CAM_1P_C06_Area_Equipamentos",
+   ambiente="bancada com capacetes, cinturoes, talabartes, conectores e bolsa de ferramentas; alguns itens com defeito",
+   ia=["Observe antes de escolher."],
+   subcenas=[
+     {"id": "C06a", "titulo": "Capacete", "camera": "CAM_1P_C06_Inspecao_Capacete",
+      "foco": "C06_Capacete_03_Rachado",
+      "ia": ["Um dos capacetes apresenta rachadura."],
+      "escolhas": [
+        esc("A", "RETIRAR DE USO.", correta=True, define={"CAPACETE_DANIFICADO": "NAO"},
+            ia=["Boa decisao.", "Equipamento danificado nao deve continuar sendo utilizado."],
+            registro=(CAT["INSP"], "CORRETO")),
+        esc("B", "USAR MESMO ASSIM.", define={"CAPACETE_DANIFICADO": "SIM"},
+            ia=["Decisao registrada."], registro=(CAT["INSP"], "PRECISA_MELHORAR"),
+            conseq=None)]},
+     {"id": "C06b", "titulo": "Cinturao", "camera": "CAM_1P_C06_Inspecao_Cinturao",
+      "foco": "C06_Cinturao_02_Corte_Fita",
+      "ia": ["%s, observe as fitas, costuras e fivelas." % N],
+      "escolhas": [
+        esc("A", "RETIRAR DE USO.", correta=True, define={"CINTURAO_DANIFICADO": "NAO"},
+            ia=["Boa decisao.", "Equipamento danificado deve ser retirado de uso."],
+            registro=(CAT["INSP"], "CORRETO")),
+        esc("B", "O CORTE E PEQUENO. VOU USAR.", define={"CINTURAO_DANIFICADO": "SIM"},
+            ia=["Decisao registrada."], registro=(CAT["INSP"], "PRECISA_MELHORAR"),
+            critica=True)]},
+     {"id": "C06c", "titulo": "Talabarte", "camera": "CAM_1P_C06_Inspecao_Talabarte",
+      "foco": "C06_Talabarte_02_Desgastado",
+      "escolhas": [
+        esc("A", "RETIRAR DE USO.", correta=True, define={"TALABARTE_DANIFICADO": "NAO"},
+            ia=["Boa decisao.", "Retire o equipamento de uso e solicite outro."],
+            registro=(CAT["INSP"], "CORRETO")),
+        esc("B", "USAR COM CUIDADO.", define={"TALABARTE_DANIFICADO": "SIM"},
+            ia=["Decisao registrada."], registro=(CAT["INSP"], "PRECISA_MELHORAR"), critica=True),
+        esc("C", "TENTAR CONSERTAR.", retornar=True,
+            ia=["Nao improvise, %s." % N, "Retire o equipamento de uso e solicite outro."],
+            registro=(CAT["INSP"], "PRECISA_MELHORAR"))]}],
+   nota="Nao revelar grande consequencia agora: CAPACETE/CINTURAO/TALABARTE_DANIFICADO reaparecem na consequencia final.",
+   proxima="C07"),
+
+ cena("C07", "Colocando o cinturao", "CAM_3P_C07_Conferencia_Cinturao", modo="3P",
+   excecao_3p="o proprio roteiro pede 3a pessoa nesta cena (o jogador precisa se ver vestindo o equipamento)",
+   sorteio_erro=["AVATAR_C07_Erro_Fita_Torcida", "AVATAR_C07_Erro_Fivela_Aberta",
+                 "AVATAR_C07_Erro_Ajuste_Frouxo", "AVATAR_C07_Erro_Colocado_Invertido"],
+   ia=["%s, alguma coisa nao esta certa." % N, "Observe novamente."],
+   escolhas=[
+     esc("A", "CORRIGIR O QUE ESTA ERRADO.", correta=True, define={"CINTURAO_AJUSTADO": "SIM"},
+         mostrar=["AVATAR_C07_Cinturao_Correto"], ia=["Agora sim."], registro=(CAT["INSP"], "CORRETO")),
+     esc("B", "ESTA BOM ASSIM.", retornar=True, define={"CINTURAO_AJUSTADO": "NAO"},
+         ia=["Observe novamente.", "Um equipamento mal colocado nao protege como deveria."],
+         registro=(CAT["INSP"], "PRECISA_MELHORAR"))],
+   proxima="C08"),
+
+ cena("C08", "Caminho ate o acesso", "CAM_1P_C08_Caminho_Obstaculo",
+   mostrar=["C08_Materiais_Bloqueando_Caminho"],
+   ia=["Durante o caminho existem materiais bloqueando parcialmente a circulacao."],
+   escolhas=[
+     esc("A", "PEDIR PARA LIBERAR O ACESSO.", correta=True,
+         mostrar=["C08_Materiais_Liberados_Organizados"], ocultar=["C08_Materiais_Bloqueando_Caminho"],
+         ia=["Boa decisao.", "Nao normalize obstaculos no caminho."], registro=(CAT["OBS"], "CORRETO")),
+     esc("B", "PASSAR POR CIMA.",
+         conseq=c3p("CAM_3P_C08_Tropeco_Obstaculo", mostrar=["AVATAR_C08_Tropeco"],
+                    ia=["Quase, %s." % N, "Um acidente pode acontecer antes mesmo de chegar ao trabalho em altura.",
+                        "Nao normalize obstaculos no caminho."]),
+         registro=(CAT["OBS"], "PRECISA_MELHORAR"))],
+   proxima="C09"),
+
+ cena("C09", "Escada de acesso", "CAM_1P_C09_Escolha_Acesso",
+   ia=["Qual caminho voce utiliza?"],
+   escolhas=[
+     esc("A", "ACESSO PREVISTO.", correta=True, define={"ACESSO_CORRETO": "SIM"},
+         ia=["Correto.", "O acesso previsto para a atividade e o caminho a ser utilizado."],
+         registro=(CAT["ACES"], "CORRETO"), rota="R02_Acesso_Previsto"),
+     esc("B", "ESCADA PORTATIL PARA ECONOMIZAR TEMPO.", retornar=True, define={"ACESSO_CORRETO": "NAO"},
+         ia=["Essa escada nao foi definida como acesso para esta atividade.",
+             "O caminho mais rapido nem sempre e o caminho seguro."],
+         registro=(CAT["ACES"], "PRECISA_MELHORAR"))],
+   proxima="C10"),
+
+ cena("C10", "Primeira abertura no piso (2o pavimento)", "CAM_1P_C10_Pav02_Abertura_Protegida",
+   ia=["Observe essa abertura.", "Ela esta protegida.",
+       "Protecoes como essa nao devem ser retiradas ou alteradas sem autorizacao."],
+   proxima="C11"),
+
+ cena("C11", "Abertura com problema (3o pavimento)", "CAM_1P_C11_Pav03_Abertura_Deslocada",
+   mostrar=["C11_Pav03_Abertura_Protecao_Deslocada"],
+   ia=["%s, existe alguma coisa diferente aqui?" % N],
+   escolhas=[
+     esc("A", "IMPEDIR A PASSAGEM E COMUNICAR.", correta=True, define={"ABERTURA_IGNORADA": "NAO"},
+         mostrar=["C11_Pav03_Passagem_Impedida_Cones", "C11_Pav03_Abertura_Corrigida",
+                  "NPC_C11_Equipe_Corrige_Ajoelhado", "NPC_C11_Equipe_Corrige_Em_Pe"],
+         ocultar=["C11_Pav03_Abertura_Protecao_Deslocada"],
+         ia=["Boa decisao.", "Um risco nao deixa de existir porque nao pertence a sua tarefa."],
+         registro=(CAT["ABER"], "CORRETO")),
+     esc("B", "NAO E MINHA AREA. CONTINUAR.", define={"ABERTURA_IGNORADA": "SIM"},
+         ia=["Decisao registrada."], registro=(CAT["ABER"], "PRECISA_MELHORAR"),
+         nota_dev="sem consequencia imediata - ver consequencia CONSEQ_ABERTURA_IGNORADA"),
+     esc("C", "COLOCAR UMA MADEIRA SOLTA POR CIMA.", retornar=True,
+         mostrar=["C11_Pav03_Madeira_Solta_Improvisada"],
+         ia=["Nao improvise.", "Uma madeira solta pode sair do lugar.", "Proteja a area e comunique o problema."],
+         registro=(CAT["ABER"], "PRECISA_MELHORAR"))],
+   proxima="C12"),
+
+ cena("C12", "Chegada ao quarto pavimento", "CAM_1P_C12_Chegada_Pav04",
+   ia=["%s, chegamos ao local." % N, "Agora compare o que voce encontrou com o que foi planejado."],
+   tela={"botoes": ["CONSULTAR PLANEJAMENTO"]},
+   proxima="C13"),
+
+ cena("C13", "Guarda-corpo com problema", "CAM_1P_C13_Guarda_Corpo_Solto",
+   mostrar=["C13_GcR_Sul05a_Levemente_Solto"], ocultar=["TorreA_Pav04_GcR_Sul_05a"],
+   ia=["Uma parte do guarda-corpo esta levemente solta.", "Aproxime-se e observe."],
+   escolhas=[
+     esc("A", "COMUNICAR E AGUARDAR A CORRECAO.", correta=True, define={"GUARDA_CORPO_PROBLEMA": "NAO"},
+         mostrar=["TorreA_Pav04_GcR_Sul_05a"], ocultar=["C13_GcR_Sul05a_Levemente_Solto"],
+         ia=["Correto.", "Uma protecao nao precisa estar caida para apresentar um problema."],
+         registro=(CAT["ABER"], "CORRETO")),
+     esc("B", "ESTA DE PE. PODE SER USADO.", define={"GUARDA_CORPO_PROBLEMA": "SIM"},
+         ia=["Decisao registrada."], registro=(CAT["ABER"], "PRECISA_MELHORAR"),
+         nota_dev="consequencia futura possivel - ver CONSEQ_GUARDA_CORPO_PROBLEMA"),
+     esc("C", "EMPURRAR PARA O LUGAR E CONTINUAR.", retornar=True, define={"GUARDA_CORPO_PROBLEMA": "SIM"},
+         ia=["Nao tente corrigir uma protecao dessa forma.",
+             "Voce nao sabe se ela esta corretamente fixada."],
+         registro=(CAT["ABER"], "PRECISA_MELHORAR"))],
+   proxima="C14"),
+
+ cena("C14", "Area abaixo", "CAM_1P_C14_Area_Abaixo",
+   mostrar=["C14_Area_Inferior_Nao_Isolada", "NPC_C14_Terreo_Carrinho_Circulando",
+            "NPC_C14_Terreo_Passando_Sob_Borda"],
+   ia=["%s, pense tambem em quem esta la embaixo." % N],
+   escolhas=[
+     esc("A", "CONFIRMAR O ISOLAMENTO DA AREA.", correta=True, define={"AREA_INFERIOR_ISOLADA": "SIM"},
+         mostrar=["C14_Area_Inferior_Isolada", "C14_Barreira_Oeste_Movel"],
+         ocultar=["C14_Area_Inferior_Nao_Isolada", "NPC_C14_Terreo_Passando_Sob_Borda"],
+         ia=["Decisao registrada."], registro=(CAT["ABX"], "CORRETO")),
+     esc("B", "TODO MUNDO CONSEGUE VER QUE ESTAMOS TRABALHANDO.", define={"AREA_INFERIOR_ISOLADA": "NAO"},
+         ia=["Decisao registrada."], registro=(CAT["ABX"], "PRECISA_MELHORAR"), critica=True),
+     esc("C", "E SO PEDIR PARA TOMAREM CUIDADO.", define={"AREA_INFERIOR_ISOLADA": "NAO"},
+         ia=["Decisao registrada."], registro=(CAT["ABX"], "PRECISA_MELHORAR"), critica=True)],
+   nota="A IA responde apenas 'Decisao registrada.' - a consequencia aparece na CENA PRINCIPAL.",
+   proxima="C15"),
+
+ cena("C15", "Material solto", "CAM_1P_C15_Material_Solto",
+   mostrar=["C15_Madeira_Solta_Junto_Borda"],
+   ia=["Existe um pequeno pedaco de madeira proximo a borda."],
+   escolhas=[
+     esc("A", "RETIRAR.", correta=True, define={"MATERIAL_SOLTO": "NAO"},
+         mostrar=["C15_Madeira_Retirada_Guardada"], ocultar=["C15_Madeira_Solta_Junto_Borda"],
+         ia=["Decisao registrada."], registro=(CAT["FERR"], "CORRETO"),
+         nota_dev="habilita a consequencia POSITIVA CONSEQ_MATERIAL_RETIRADO (mostrar mais tarde, junto do vento)"),
+     esc("B", "DEIXAR.", define={"MATERIAL_SOLTO": "SIM"}, ia=["Decisao registrada."],
+         registro=(CAT["FERR"], "PRECISA_MELHORAR"),
+         nota_dev="sem consequencia imediata - ver CONSEQ_MATERIAL_SOLTO")],
+   proxima="C16"),
+
+ cena("C16", "Outras equipes", "CAM_1P_C16_Outras_Equipes",
+   mostrar=["NPC_C16_Pedreiro_Assentando", "NPC_C16_Servente_Carrinho_Blocos"],
+   ia=["Outras pessoas estao trabalhando perto de voce.", "Essa atividade pode interferir na sua?"],
+   escolhas=[
+     esc("A", "CONFERIR E COORDENAR AS ATIVIDADES.", correta=True, define={"INTERFERENCIA_EQUIPE": "NAO"},
+         mostrar=["NPC_Pav04_Encarregado"],
+         ia=["Boa decisao.", "Quando duas atividades podem interferir uma na outra, precisamos conferir antes de continuar."],
+         registro=(CAT["OBS"], "CORRETO")),
+     esc("B", "CADA EQUIPE CUIDA DO SEU SERVICO.", define={"INTERFERENCIA_EQUIPE": "SIM"},
+         ia=["Decisao registrada."], registro=(CAT["OBS"], "PRECISA_MELHORAR"))],
+   proxima="C17"),
+
+ cena("C17", "Condicoes do ambiente", "CAM_1P_C17_Condicoes_Ambiente",
+   mostrar=["C17_Fita_Indicadora_Vento", "C17_Biruta_Canteiro", "C17_Lona_Cobrindo_Material"],
+   define={"CONDICAO_AMBIENTAL_SEGURA": "SIM"},
+   ia=["Neste momento, as condicoes permitem continuar.", "Mas continue observando."],
+   proxima="C18"),
+
+ cena("C18", "Ponto de conexao", "CAM_1P_C18_Ponto_Conexao",
+   ambiente="no mesmo quadro: ponto identificado (PA-04-01), guarda-corpo, vergalhao, tubulacao e estrutura metalica",
+   ia=["%s, identifique onde o sistema previsto para este servico deve ser conectado." % N],
+   escolhas=[
+     esc("A", "PONTO IDENTIFICADO (PA-04-01).", correta=True, define={"CONEXAO_INCORRETA": "NAO"},
+         foco="C18_Ponto_Ancoragem_PA0401",
+         ia=["Correto.", "Esse e o ponto previsto e identificado para esta atividade."],
+         registro=(CAT["QUED"], "CORRETO")),
+     esc("B", "GUARDA-CORPO.", define={"CONEXAO_INCORRETA": "SIM", "PONTO_ESCOLHIDO": "GUARDA_CORPO"},
+         ia=["Decisao registrada."], registro=(CAT["QUED"], "PRECISA_MELHORAR"), critica=True),
+     esc("C", "VERGALHAO.", define={"CONEXAO_INCORRETA": "SIM", "PONTO_ESCOLHIDO": "VERGALHAO"},
+         foco="C18_Distrator_Vergalhao", ia=["Decisao registrada."],
+         registro=(CAT["QUED"], "PRECISA_MELHORAR"), critica=True),
+     esc("D", "TUBULACAO.", define={"CONEXAO_INCORRETA": "SIM", "PONTO_ESCOLHIDO": "TUBULACAO"},
+         foco="C18_Distrator_Tubulacao", ia=["Decisao registrada."],
+         registro=(CAT["QUED"], "PRECISA_MELHORAR"), critica=True),
+     esc("E", "ESTRUTURA METALICA.", define={"CONEXAO_INCORRETA": "SIM", "PONTO_ESCOLHIDO": "ESTRUTURA_METALICA"},
+         foco="C18_Distrator_Estrutura_Metalica", ia=["Decisao registrada."],
+         registro=(CAT["QUED"], "PRECISA_MELHORAR"), critica=True)],
+   nota="Nao revelar o erro agora - ver CONSEQ_CONEXAO_INCORRETA. Regra tecnica 3: tubulacao, vergalhao e guarda-corpo nao sao ponto de ancoragem por padrao.",
+   proxima="C19"),
+
+ cena("C19", "Entrando na regiao de exposicao", "CAM_1P_C19_Regiao_Exposicao",
+   gatilho="TRG_EXPOSICAO_Zona_Risco_Queda",
+   ia=["%s, a partir daqui existe risco de queda." % N,
+       "Permaneca protegido conforme o sistema definido para esse trabalho."],
+   escolhas=[
+     esc("A", "REALIZAR A MOVIMENTACAO CORRETAMENTE.", correta=True,
+         mostrar=["AVATAR_TAREFA_Ajoelhado_Conectado"],
+         ia=["Correto."], registro=(CAT["QUED"], "CORRETO")),
+     esc("B", "DESCONECTAR POR ALGUNS SEGUNDOS.",
+         conseq=c3p("CAM_3P_C19_Desconectado_Escorrega", mostrar=["AVATAR_C19_Desconectado_Escorrega"], congelar=True,
+                    ia=["Foram apenas alguns segundos.", "Mas uma queda tambem pode acontecer em poucos segundos."]),
+         registro=(CAT["QUED"], "PRECISA_MELHORAR"), critica=True),
+     esc("C", "IMPROVISAR PARA AUMENTAR O ALCANCE.", retornar=True,
+         ia=["Nao improvise.", "Se o sistema nao atende ao trabalho, pare e comunique."],
+         registro=(CAT["QUED"], "PRECISA_MELHORAR")),
+     esc("D", "FAZER NO NO EQUIPAMENTO.", retornar=True,
+         ia=["Nao improvise.", "Se o sistema nao atende ao trabalho, pare e comunique."],
+         registro=(CAT["QUED"], "PRECISA_MELHORAR"))],
+   proxima="C20"),
+
+ cena("C20", "Preparacao das ferramentas", "CAM_1P_C20_Ferramentas",
+   mostrar=["C20_Ferramentas_Soltas", "C20_Base_Apoio_Ferramentas"],
+   ia=["%s, o que acontece se alguma dessas ferramentas escapar?" % N],
+   escolhas=[
+     esc("A", "PROTEGER FERRAMENTAS E MATERIAIS CONTRA QUEDA.", correta=True,
+         define={"FERRAMENTAS_PROTEGIDAS": "SIM"},
+         mostrar=["C20_Ferramentas_Protegidas"], ocultar=["C20_Ferramentas_Soltas"],
+         ia=["Boa decisao."], registro=(CAT["FERR"], "CORRETO")),
+     esc("B", "VOU SEGURAR BEM.", define={"FERRAMENTAS_PROTEGIDAS": "NAO"},
+         ia=["Decisao registrada."], registro=(CAT["FERR"], "PRECISA_MELHORAR"), critica=True),
+     esc("C", "NINGUEM VAI FICAR EMBAIXO.", define={"FERRAMENTAS_PROTEGIDAS": "NAO"},
+         ia=["Decisao registrada."], registro=(CAT["FERR"], "PRECISA_MELHORAR"), critica=True)],
+   proxima="C21"),
+
+ cena("C21", "Inicio da tarefa", "CAM_1P_C21_Inicio_Tarefa",
+   maos="MAOS_1P_C21_Chave",
+   mostrar=["MAOS_1P_C21_Chave", "C21_Suporte_Posicionado"], ocultar=["C21_Suporte_Aguardando"],
+   etapas=["posiciona o suporte", "pega a ferramenta", "inicia a fixacao",
+           "aperta o primeiro ponto", "verifica posicao"],
+   ia=["Vamos comecar."],
+   abre_eventos=True,
+   nota="A partir daqui o sistema de eventos inesperados passa a sortear eventos entre as etapas.",
+   proxima="PRINC"),
+]
+
+
+# ================================================================= EVENTOS INESPERADOS
+def ev(id, titulo, camera, variavel, **kw):
+    d = {"id": id, "titulo": titulo, "modo": "1P", "camera": camera, "variavel_evento": variavel}
+    d.update(kw)
+    return d
+
+
+EVENTOS = [
+ ev("EV01", "Alguem remove o guarda-corpo", "CAM_1P_EV01_Colega_Retira_GcR", "EVENTO_GUARDA_CORPO_REMOVIDO",
+    peso=3, momento="durante a preparacao ou a fixacao",
+    mostrar=["NPC_EV01_Colega_Retira_GcR", "EV01_Material_Longo_Tubos", "NPC_EV01_Andaime_Recebe_Material"],
+    falas=[{"quem": "OUTRO TRABALHADOR", "texto": "Parceiro, vou tirar isso aqui so um minutinho para passar o material."},
+           {"quem": "OUTRO TRABALHADOR", "texto": "E rapidinho."},
+           {"quem": "OUTRO TRABALHADOR", "texto": "Depois eu coloco de volta."}],
+    ia_silenciosa=True,
+    nota="A IA NAO interfere. O jogador precisa decidir sozinho.",
+    escolhas=[
+      esc("A", "PARAR A SITUACAO E INFORMAR QUE A PROTECAO NAO PODE SER SIMPLESMENTE RETIRADA.", correta=True,
+          mostrar=["NPC_Pav04_Encarregado"], ocultar=["NPC_EV01_Colega_Retira_GcR"],
+          falas=[{"quem": "TRABALHADOR", "texto": "Nao retire a protecao assim."},
+                 {"quem": "TRABALHADOR", "texto": "Vamos comunicar e fazer isso da forma prevista."}],
+          ia=["Boa decisao, %s." % N, "A protecao existia por um motivo.",
+              "Uma necessidade de producao nao permite simplesmente criar uma abertura perigosa."],
+          registro=(CAT["ABER"], "CORRETO")),
+      esc("B", "DEIXAR. ELE DISSE QUE VAI COLOCAR DE VOLTA.",
+          mostrar=["EV01_GcR_Sul04a_Removido_Vao_Aberto", "EV01_Pecas_GcR_Retiradas_no_Piso"],
+          ocultar=["TorreA_Pav04_GcR_Sul_04a", "NPC_EV01_Colega_Retira_GcR"],
+          conseq=c3p("CAM_3P_EV01_Vao_Aberto",
+                     mostrar=["EV01_GcR_Sul04a_Removido_Vao_Aberto", "EV01_Pecas_GcR_Retiradas_no_Piso"],
+                     ocultar=["TorreA_Pav04_GcR_Sul_04a"],
+                     ia=["%s, lembra do 'e rapidinho'?" % N, "A protecao ainda nao voltou para o lugar.",
+                         "Uma situacao temporaria acabou criando um risco para todos que trabalham aqui."],
+                     nota="mostrar alguns minutos depois, quando o jogador passar proximo do vao"),
+          registro=(CAT["ABER"], "PRECISA_MELHORAR"), critica=True),
+      esc("C", "AFASTAR-ME UM POUCO ENQUANTO ELE PASSA O MATERIAL.",
+          mostrar=["EV01_GcR_Sul04a_Removido_Vao_Aberto", "EV01_Pecas_GcR_Retiradas_no_Piso"],
+          ocultar=["TorreA_Pav04_GcR_Sul_04a", "NPC_EV01_Colega_Retira_GcR"],
+          conseq=c3p("CAM_3P_EV01_Vao_Aberto",
+                     mostrar=["EV01_GcR_Sul04a_Removido_Vao_Aberto", "EV01_Pecas_GcR_Retiradas_no_Piso"],
+                     ocultar=["TorreA_Pav04_GcR_Sul_04a"],
+                     ia=["%s, lembra do 'e rapidinho'?" % N, "A protecao ainda nao voltou para o lugar.",
+                         "Uma situacao temporaria acabou criando um risco para todos que trabalham aqui."]),
+          registro=(CAT["ABER"], "PRECISA_MELHORAR"), critica=True)]),
+
+ ev("EV02", "Trabalhador entra na area isolada", "CAM_1P_EV02_Invasao_Area_Isolada", "EVENTO_INVASAO_AREA_ISOLADA",
+    peso=3, requer={"AREA_INFERIOR_ISOLADA": "SIM"},
+    mostrar=["C14_Area_Inferior_Isolada", "EV02_Barreira_Afastada", "NPC_EV02_Afasta_Barreira_Entra"],
+    ocultar=["C14_Barreira_Oeste_Movel"],
+    ia=["%s, observe a area abaixo." % N],
+    escolhas=[
+      esc("A", "INTERROMPER A ATIVIDADE E PEDIR PARA RESTABELECER O ISOLAMENTO.", correta=True,
+          mostrar=["C14_Barreira_Oeste_Movel"], ocultar=["EV02_Barreira_Afastada", "NPC_EV02_Afasta_Barreira_Entra"],
+          ia=["Correto.", "Uma protecao deixa de cumprir sua funcao quando alguem passa por ela."],
+          registro=(CAT["ABX"], "CORRETO")),
+      esc("B", "ELE VAI PASSAR RAPIDO.",
+          conseq=c3p("CAM_3P_EV02_Peca_Escapa",
+                     mostrar=["EV02_Barreira_Afastada", "NPC_EV02_Dentro_Area_Isolada", "EV02_Peca_Escapa_Congelada"],
+                     congelar=True,
+                     ia=["O isolamento existia.", "Mas quando ele deixou de funcionar, o trabalho continuou.",
+                         "A situacao precisava ter sido corrigida antes de prosseguir."]),
+          registro=(CAT["ABX"], "PRECISA_MELHORAR"), critica=True),
+      esc("C", "GRITAR PARA ELE TOMAR CUIDADO E CONTINUAR.",
+          conseq=c3p("CAM_3P_EV02_Peca_Escapa",
+                     mostrar=["EV02_Barreira_Afastada", "NPC_EV02_Dentro_Area_Isolada", "EV02_Peca_Escapa_Congelada"],
+                     congelar=True,
+                     ia=["O isolamento existia.", "Mas quando ele deixou de funcionar, o trabalho continuou.",
+                         "A situacao precisava ter sido corrigida antes de prosseguir."]),
+          registro=(CAT["ABX"], "PRECISA_MELHORAR"), critica=True)]),
+
+ ev("EV03", "Objeto cai de um pavimento superior", "CAM_1P_EV03_Objeto_Cai_Superior", "EVENTO_OBJETO_SUPERIOR",
+    peso=3, som="CLANG!",
+    mostrar=["EV03_Objeto_01_Impacto_Proximo", "NPC_EV03_Colega_Assustado", "EV03_Origem_Blocos_Junto_Borda_Pav05"],
+    falas=[{"quem": "COLEGA", "texto": "Caramba!"}],
+    ia=["%s, alguma coisa acabou de mudar no ambiente." % N, "O que voce faz?"],
+    escolhas=[
+      esc("A", "INTERROMPER A ATIVIDADE E COMUNICAR A QUEDA DO MATERIAL.", correta=True,
+          ia=["Correto.", "O objeto nao atingiu ninguem.",
+              "Mas isso nao significa que devemos ignorar o que aconteceu.",
+              "A origem precisa ser verificada antes de continuar expondo pessoas."],
+          registro=(CAT["INES"], "CORRETO")),
+      esc("B", "NAO ATINGIU NINGUEM. CONTINUAR.",
+          conseq=c3p("CAM_3P_EV03_Segundo_Objeto",
+                     mostrar=["EV03_Objeto_02_Congelado_Mais_Proximo", "EV03_Objeto_01_Impacto_Proximo",
+                              "AVATAR_TAREFA_Ajoelhado_Conectado"], congelar=True,
+                     ia=["O primeiro objeto foi um aviso.",
+                         "A ausencia de acidente nao significava ausencia de risco."]),
+          registro=(CAT["INES"], "PRECISA_MELHORAR")),
+      esc("C", "OLHAR RAPIDAMENTE PARA CIMA E CONTINUAR.",
+          conseq=c3p("CAM_3P_EV03_Segundo_Objeto",
+                     mostrar=["EV03_Objeto_02_Congelado_Mais_Proximo", "EV03_Objeto_01_Impacto_Proximo",
+                              "AVATAR_TAREFA_Ajoelhado_Conectado"], congelar=True,
+                     ia=["O primeiro objeto foi um aviso.",
+                         "A ausencia de acidente nao significava ausencia de risco."]),
+          registro=(CAT["INES"], "PRECISA_MELHORAR"))]),
+
+ ev("EV04", "Movimentacao de carga proxima", "CAM_1P_EV04_Movimentacao_Carga", "EVENTO_MOVIMENTACAO_CARGA",
+    peso=2, mostrar=["EV04_Paleteira_Palete_Inicio", "NPC_EV04_Operador_Paleteira_Inicio", "NPC_Pav04_Encarregado"],
+    falas=[{"quem": "RADIO", "texto": "Vamos fazer uma movimentacao aqui do lado."},
+           {"quem": "ENCARREGADO", "texto": "Da para voces dois trabalharem ao mesmo tempo."}],
+    escolhas=[
+      esc("A", "PARAR E CONFIRMAR SE A MOVIMENTACAO E COMPATIVEL COM O SERVICO.", correta=True,
+          define={"INTERFERENCIA_EQUIPE": "NAO"},
+          ia=["Boa decisao.",
+              "Quando duas atividades podem interferir uma na outra, precisamos conferir antes de continuar."],
+          registro=(CAT["OBS"], "CORRETO")),
+      esc("B", "CONTINUAR. CADA UM FICA NO SEU CANTO.", define={"INTERFERENCIA_EQUIPE": "SIM"},
+          conseq=c3p("CAM_3P_EV04_Carga_Aproxima",
+                     mostrar=["EV04_Paleteira_Palete_Aproximando", "NPC_EV04_Operador_Paleteira_Aproximando",
+                              "NPC_EV04_Auxiliar_Entra_Na_Area", "AVATAR_TAREFA_Ajoelhado_Conectado"],
+                     ocultar=["EV04_Paleteira_Palete_Inicio", "NPC_EV04_Operador_Paleteira_Inicio"], congelar=True,
+                     ia=["Duas atividades seguras quando feitas separadamente podem criar novos riscos quando acontecem juntas."]),
+          registro=(CAT["OBS"], "PRECISA_MELHORAR")),
+      esc("C", "TERMINAR RAPIDO ANTES DA CARGA CHEGAR.", define={"INTERFERENCIA_EQUIPE": "SIM"},
+          conseq=c3p("CAM_3P_EV04_Carga_Aproxima",
+                     mostrar=["EV04_Paleteira_Palete_Aproximando", "NPC_EV04_Operador_Paleteira_Aproximando",
+                              "NPC_EV04_Auxiliar_Entra_Na_Area", "AVATAR_TAREFA_Ajoelhado_Conectado"],
+                     ocultar=["EV04_Paleteira_Palete_Inicio", "NPC_EV04_Operador_Paleteira_Inicio"], congelar=True,
+                     ia=["Duas atividades seguras quando feitas separadamente podem criar novos riscos quando acontecem juntas."]),
+          registro=(CAT["OBS"], "PRECISA_MELHORAR"))]),
+
+ ev("EV05", "O radio para de funcionar", "CAM_1P_EV05_Radio_Sem_Resposta", "EVENTO_RADIO",
+    peso=3, maos="MAOS_1P_EV05_Radio", mostrar=["MAOS_1P_EV05_Radio"], som="chiado",
+    falas=[{"quem": "TRABALHADOR", "texto": "Encarregado, esta me ouvindo?"}],
+    ia=["%s, o meio de comunicacao previsto nao esta funcionando." % N],
+    escolhas=[
+      esc("A", "INTERROMPER E RESTABELECER A COMUNICACAO.", correta=True,
+          define={"COMUNICACAO_FUNCIONANDO": "SIM"}, mostrar=["NPC_EV05_Encarregado_Radio_Substituto"],
+          ia=["Correto.",
+              "Se a comunicacao faz parte do planejamento, nao continue simplesmente como se nada tivesse mudado."],
+          registro=(CAT["COM"], "CORRETO"),
+          nota_dev="habilita a consequencia POSITIVA CONSEQ_COMUNICACAO_RESTABELECIDA"),
+      esc("B", "ESTOU QUASE TERMINANDO. CONTINUAR.", define={"COMUNICACAO_FUNCIONANDO": "NAO"},
+          conseq=c3p("CAM_3P_EV05_Radio_Sem_Resposta", mostrar=["AVATAR_EV05_Radio_Sem_Resposta"],
+                     ia=["O problema parecia pequeno quando apareceu.",
+                         "Agora voce esta precisando justamente da comunicacao que decidiu ignorar."],
+                     nota="mostrar mais tarde, quando o jogador precisar pedir ajuda"),
+          registro=(CAT["COM"], "PRECISA_MELHORAR")),
+      esc("C", "SE ACONTECER ALGUMA COISA, EU GRITO.", define={"COMUNICACAO_FUNCIONANDO": "NAO"},
+          conseq=c3p("CAM_3P_EV05_Radio_Sem_Resposta", mostrar=["AVATAR_EV05_Radio_Sem_Resposta"],
+                     ia=["O problema parecia pequeno quando apareceu.",
+                         "Agora voce esta precisando justamente da comunicacao que decidiu ignorar."]),
+          registro=(CAT["COM"], "PRECISA_MELHORAR"))]),
+
+ ev("EV06", "Rajada de vento", "CAM_1P_EV06_Rajada_Vento", "EVENTO_VENTO",
+    peso=2, mostrar=["EV06_Lona_Batendo_Poeira"], ocultar=["C17_Lona_Cobrindo_Material"],
+    falas=[{"quem": "ENCARREGADO (RADIO)", "texto": "%s, falta pouco?" % N},
+           {"quem": "ENCARREGADO (RADIO)", "texto": "Se der, termina antes de piorar."}],
+    escolhas=[
+      esc("A", "INTERROMPER E REAVALIAR AS CONDICOES.", correta=True,
+          define={"CONDICAO_AMBIENTAL_SEGURA": "NAO"},
+          conseq=c3p("CAM_3P_EV06_A_Rajada_Forte",
+                     mostrar=["AVATAR_EV06_A_Parado_Area_Segura", "EV06_Lona_Batendo_Poeira"],
+                     ocultar=["C17_Lona_Cobrindo_Material"],
+                     ia=["Observe.", "As condicoes pioraram.", "Parar antes evitou que voce permanecesse exposto."]),
+          registro=(CAT["MUD"], "CORRETO")),
+      esc("B", "TERMINAR RAPIDO.",
+          conseq=c3p("CAM_3P_EV06_Rajada_Desequilibrio",
+                     mostrar=["AVATAR_EV06_Desequilibrio_Sistema_Atua", "EV06_Lona_Batendo_Poeira"],
+                     ocultar=["C17_Lona_Cobrindo_Material"], congelar=True,
+                     ia=["Faltava pouco.", "Mas o risco nao diminui porque o servico esta quase terminado."]),
+          registro=(CAT["MUD"], "PRECISA_MELHORAR")),
+      esc("C", "CONTINUAR COM MAIS CUIDADO.",
+          conseq=c3p("CAM_3P_EV06_Rajada_Desequilibrio",
+                     mostrar=["AVATAR_EV06_Desequilibrio_Sistema_Atua", "EV06_Lona_Batendo_Poeira"],
+                     ocultar=["C17_Lona_Cobrindo_Material"], congelar=True,
+                     ia=["Faltava pouco.", "Mas o risco nao diminui porque o servico esta quase terminado."]),
+          registro=(CAT["MUD"], "PRECISA_MELHORAR"))]),
+
+ ev("EV07", "Colega pede para usar o mesmo ponto", "CAM_1P_EV07_Colega_Mesmo_Ponto", "EVENTO_SEGUNDO_TRABALHADOR",
+    peso=2, mostrar=["NPC_EV07_Colega_Pede_Mesmo_Ponto"],
+    falas=[{"quem": "COLEGA", "texto": "%s, prende o meu aqui junto com o seu." % N},
+           {"quem": "COLEGA", "texto": "E so um servico rapido."}],
+    nota="No cenario nao existe confirmacao de que aquele sistema foi planejado para essa utilizacao.",
+    escolhas=[
+      esc("A", "NAO PERMITIR E PEDIR QUE ELE UTILIZE O SISTEMA PREVISTO PARA A ATIVIDADE DELE.", correta=True,
+          ia=["Correto.",
+              "Nao presuma que um ponto ou sistema pode receber outra pessoa apenas porque parece resistente.",
+              "Cada atividade precisa seguir o que foi previsto."],
+          registro=(CAT["QUED"], "CORRETO")),
+      esc("B", "DEIXAR, PORQUE O PONTO PARECE FORTE.", retornar=True,
+          ia=["Voce acabou de tomar uma decisao sobre algo que nao foi confirmado.",
+              "Nao improvise a utilizacao de um sistema de protecao."],
+          registro=(CAT["QUED"], "PRECISA_MELHORAR")),
+      esc("C", "DEIXAR APENAS POR ALGUNS MINUTOS.", retornar=True,
+          ia=["Voce acabou de tomar uma decisao sobre algo que nao foi confirmado.",
+              "Nao improvise a utilizacao de um sistema de protecao."],
+          registro=(CAT["QUED"], "PRECISA_MELHORAR"))]),
+
+ ev("EV08", "Material aparece no caminho", "CAM_1P_EV08_Material_Na_Rota", "EVENTO_OBSTACULO_NOVO",
+    peso=2, mostrar=["EV08_Cabo_Mangueira_Na_Rota_Saida"],
+    ia=["%s, esse caminho estava assim quando voce chegou?" % N],
+    escolhas=[
+      esc("A", "PROVIDENCIAR A RETIRADA OU ORGANIZACAO ANTES DE PASSAR.", correta=True,
+          ocultar=["EV08_Cabo_Mangueira_Na_Rota_Saida"],
+          ia=["Correto.", "A obra mudou enquanto voce trabalhava.",
+              "Por isso precisamos continuar observando ate o final."],
+          registro=(CAT["MUD"], "CORRETO")),
+      esc("B", "PASSAR POR CIMA.",
+          conseq=c3p("CAM_3P_EV08_Quase_Tropeco",
+                     mostrar=["EV08_Cabo_Mangueira_Na_Rota_Saida", "AVATAR_EV08_Quase_Tropeco"],
+                     ia=["Quase.", "Se isso acontecesse proximo da area de risco, a situacao seria mais seria."]),
+          registro=(CAT["MUD"], "PRECISA_MELHORAR")),
+      esc("C", "PULAR.",
+          conseq=c3p("CAM_3P_EV08_Quase_Tropeco",
+                     mostrar=["EV08_Cabo_Mangueira_Na_Rota_Saida", "AVATAR_EV08_Quase_Tropeco"],
+                     ia=["Quase.", "Se isso acontecesse proximo da area de risco, a situacao seria mais seria."]),
+          registro=(CAT["MUD"], "PRECISA_MELHORAR"))]),
+
+ ev("EV09", "Colega se sente mal", "CAM_1P_EV09_Colega_Tontura", "EVENTO_MAL_ESTAR",
+    peso=2, mostrar=["NPC_EV09_Colega_Tontura"],
+    falas=[{"quem": "COLEGA", "texto": "Estou meio tonto."}, {"quem": "COLEGA", "texto": "Ja passa."}],
+    nota="Ele esta proximo de uma area onde existe risco de queda.",
+    escolhas=[
+      esc("A", "AFASTAR O TRABALHADOR DA EXPOSICAO DE FORMA SEGURA E COMUNICAR A SITUACAO.", correta=True,
+          ocultar=["NPC_EV09_Colega_Tontura"],
+          ia=["Boa decisao.",
+              "Uma pessoa que nao esta em condicoes de continuar nao deve permanecer exposta ao risco."],
+          registro=(CAT["INES"], "CORRETO")),
+      esc("B", "ELE DISSE QUE ESTA BEM. DEIXAR CONTINUAR.",
+          conseq=c3p("CAM_3P_EV09_Colega_Desequilibrio", mostrar=["NPC_EV09_Colega_Desequilibrio"],
+                     ocultar=["NPC_EV09_Colega_Tontura"], congelar=True,
+                     ia=["Ele avisou que nao estava se sentindo bem.",
+                         "A situacao precisava ter sido tratada antes de continuar."]),
+          registro=(CAT["INES"], "PRECISA_MELHORAR")),
+      esc("C", "DAR AGUA E PEDIR PARA TERMINAR PRIMEIRO.",
+          conseq=c3p("CAM_3P_EV09_Colega_Desequilibrio", mostrar=["NPC_EV09_Colega_Desequilibrio"],
+                     ocultar=["NPC_EV09_Colega_Tontura"], congelar=True,
+                     ia=["Ele avisou que nao estava se sentindo bem.",
+                         "A situacao precisava ter sido tratada antes de continuar."]),
+          registro=(CAT["INES"], "PRECISA_MELHORAR"))]),
+
+ ev("EV10", "Protecao foi alterada durante o intervalo", "CAM_1P_EV10_Protecao_Alterada", "EVENTO_PROTECAO_ALTERADA",
+    peso=2, momento="depois de uma pequena pausa (o jogador sai da area e volta)",
+    mostrar=["EV10_GcR_Sul05b_Travessao_Intermediario_Removido"], ocultar=["TorreA_Pav04_GcR_Sul_05b"],
+    ia=["%s, voce ja verificou este lugar antes." % N, "Mas passou algum tempo.", "O que voce faz?"],
+    escolhas=[
+      esc("A", "CONFERIR NOVAMENTE ANTES DE RECOMECAR.", correta=True,
+          ia=["Boa.", "Verificar uma vez nao significa que o local continuara igual para sempre."],
+          registro=(CAT["MUD"], "CORRETO")),
+      esc("B", "JA VERIFIQUEI ANTES. CONTINUAR.",
+          conseq=c3p("CAM_3P_EV10_Protecao_Alterada",
+                     mostrar=["EV10_GcR_Sul05b_Travessao_Intermediario_Removido", "AVATAR_TAREFA_Ajoelhado_Conectado"],
+                     ocultar=["TorreA_Pav04_GcR_Sul_05b"],
+                     ia=["A obra mudou enquanto voce estava fora."]),
+          registro=(CAT["MUD"], "PRECISA_MELHORAR"))]),
+
+ ev("EV11", "Faz so esse ultimo", "CAM_1P_EV11_Faz_So_Esse_Ultimo", "EVENTO_PRESSAO_FINAL",
+    peso=3, momento="servico praticamente concluido",
+    mostrar=["NPC_PRINC_Trabalhador_Abaixo"], ocultar=["NPC_C14_Terreo_Passando_Sob_Borda"],
+    condicao_mudou=["vento", "protecao alterada", "trabalhador abaixo", "movimentacao proxima"],
+    falas=[{"quem": "ENCARREGADO", "texto": "%s, ja que falta so um, termina esse ultimo." % N}],
+    escolhas=[
+      esc("A", "PARAR PORQUE A CONDICAO MUDOU.", correta=True,
+          ia=["Boa decisao.", "Uma atividade nao se torna segura porque falta pouco."],
+          registro=(CAT["MUD"], "CORRETO")),
+      esc("B", "FAZER APENAS O ULTIMO.",
+          conseq=c3p("CAM_3P_EV11_Susto", mostrar=["AVATAR_EV11_Susto", "NPC_PRINC_Trabalhador_Abaixo"],
+                     congelar=True,
+                     ia=["Essa e uma das frases mais perigosas quando substitui uma avaliacao correta.",
+                         "'E so o ultimo.'", "'E rapidinho.'", "'Nunca aconteceu nada.'",
+                         "A condicao precisa ser segura ate o ultimo segundo do trabalho."],
+                     nota="nao gerar queda - apenas um susto e congelar"),
+          registro=(CAT["MUD"], "PRECISA_MELHORAR"))]),
+
+ ev("EV12", "Quase acidente sem culpa do jogador", "CAM_1P_EV12_Quase_Acidente_Retido", "EVENTO_QUASE_ACIDENTE_EXTERNO",
+    peso=2, sem_escolha=True,
+    mostrar=["EV12_Fragmento_Retido_Pelo_Rodape", "NPC_EV12_Pedreiro_Cortando_Bloco"],
+    ia=["%s, desta vez voce nao provocou a situacao." % N, "Mesmo assim, percebe o que aconteceu?",
+        "As medidas de protecao existentes impediram que um evento inesperado se transformasse em acidente."],
+    consequencia_didatica=c3p("CAM_3P_EV12_Fragmento_Retido",
+                              mostrar=["EV12_Fragmento_Retido_Pelo_Rodape", "NPC_EV12_Pedreiro_Cortando_Bloco"],
+                              ia=["Seguranca nao existe apenas para corrigir erros.",
+                                  "Ela tambem prepara o local para o imprevisto."],
+                              nota="consequencia POSITIVA - mostra o rodape retendo o fragmento"),
+    registro_automatico={"categoria": CAT["INES"], "resultado": "CORRETO"}),
+
+ ev("EV13", "Ponto de identificacao nao esta legivel", "CAM_1P_EV13_Identificacao_Ilegivel", "EVENTO_IDENTIFICACAO_INDISPONIVEL",
+    peso=2, momento="antes da conexao (substitui/antecede a C18)",
+    mostrar=["EV13_Identificacao_PA0401_Ilegivel"], ocultar=["C18_Identificacao_PA0401_Legivel"],
+    escolhas=[
+      esc("A", "PARAR E CONFIRMAR QUAL PONTO DEVE SER UTILIZADO.", correta=True,
+          mostrar=["C18_Identificacao_PA0401_Legivel"], ocultar=["EV13_Identificacao_PA0401_Ilegivel"],
+          ia=["Correto.", "Quando nao tiver certeza, nao adivinhe."], registro=(CAT["QUED"], "CORRETO")),
+      esc("B", "USAR O QUE PARECE CERTO.", retornar=True,
+          ia=["Pare.", "A falta de informacao nao e autorizacao para escolher por conta propria."],
+          registro=(CAT["QUED"], "PRECISA_MELHORAR")),
+      esc("C", "ESCOLHER O MAIS FORTE VISUALMENTE.", retornar=True,
+          ia=["Pare.", "A falta de informacao nao e autorizacao para escolher por conta propria."],
+          registro=(CAT["QUED"], "PRECISA_MELHORAR"))]),
+
+ ev("EV14", "Ferramenta defeituosa", "CAM_1P_EV14_Ferramenta_Defeituosa", "EVENTO_FERRAMENTA_DEFEITUOSA",
+    peso=2, mostrar=["EV14_Ferramenta_Eletrica_Cabo_Danificado", "NPC_EV14_Colega_Da_Para_Terminar"],
+    sintomas=["vibracao anormal", "cabo danificado percebido", "funcionamento intermitente", "peca solta"],
+    falas=[{"quem": "COLEGA", "texto": "Da para terminar com ela."}],
+    escolhas=[
+      esc("A", "PARAR DE UTILIZAR E PROVIDENCIAR A VERIFICACAO/SUBSTITUICAO.", correta=True,
+          ocultar=["EV14_Ferramenta_Eletrica_Cabo_Danificado"],
+          ia=["Boa decisao.",
+              "Quando um equipamento apresenta problema, improvisar para terminar mais rapido pode criar outro risco."],
+          registro=(CAT["INES"], "CORRETO")),
+      esc("B", "TERMINAR O SERVICO.",
+          conseq=c3p("CAM_3P_EV14_Ferramenta_Movimento", mostrar=["AVATAR_EV14_Ferramenta_Tranco"], congelar=True,
+                     ia=["A ferramenta parou de repente e provocou um movimento inesperado."],
+                     nota="sem lesao explicita"),
+          registro=(CAT["INES"], "PRECISA_MELHORAR")),
+      esc("C", "DAR UM JEITO TEMPORARIO.",
+          conseq=c3p("CAM_3P_EV14_Ferramenta_Movimento", mostrar=["AVATAR_EV14_Ferramenta_Tranco"], congelar=True,
+                     ia=["Nao improvise.",
+                         "A ferramenta parou de repente e provocou um movimento inesperado."]),
+          registro=(CAT["INES"], "PRECISA_MELHORAR"))]),
+
+ ev("EV15", "Barulho de impacto na protecao", "CAM_1P_EV15_Impacto_Protecao", "EVENTO_IMPACTO_PROTECAO",
+    peso=2, som="CLANG!",
+    mostrar=["EV15_GcR_Sul04b_Impacto_Sem_Dano_Aparente", "EV15_Tubo_Que_Atingiu_Protecao"],
+    ocultar=["TorreA_Pav04_GcR_Sul_04b"],
+    escolhas=[
+      esc("A", "INTERROMPER E VERIFICAR A CONDICAO DA PROTECAO ANTES DE CONTINUAR.", correta=True,
+          mostrar=["TorreA_Pav04_GcR_Sul_04b"], ocultar=["EV15_GcR_Sul04b_Impacto_Sem_Dano_Aparente"],
+          ia=["Correto.",
+              "Depois de um impacto, nao presuma que tudo continua igual apenas porque parece normal."],
+          registro=(CAT["INES"], "CORRETO")),
+      esc("B", "NAO QUEBROU. CONTINUAR.",
+          conseq=c3p("CAM_3P_EV15_Protecao_Deslocada", mostrar=["EV15_GcR_Sul04b_Deslocado_Depois"],
+                     ocultar=["TorreA_Pav04_GcR_Sul_04b", "EV15_GcR_Sul04b_Impacto_Sem_Dano_Aparente"],
+                     ia=["O impacto anterior era uma informacao importante."],
+                     nota="mostrar mais tarde: a protecao apresenta movimento"),
+          registro=(CAT["INES"], "PRECISA_MELHORAR"))]),
+
+ ev("EV16", "Chuva inesperada", "CAM_1P_EV16_Chuva", "EVENTO_CHUVA",
+    peso=1, mostrar=["EV16_Piso_Molhado_Chuva"],
+    ia=["%s, o ambiente mudou." % N, "O que foi definido para essa situacao?"],
+    tela={"botoes": ["CONSULTAR PLANEJAMENTO"]},
+    escolhas=[
+      esc("A", "CONSULTAR O PLANEJAMENTO E SEGUIR O QUE FOI DEFINIDO.", correta=True,
+          ia=["Correto.", "A condicao mudou: verificamos o que foi planejado antes de decidir."],
+          registro=(CAT["MUD"], "CORRETO")),
+      esc("B", "CHOVEU, ENTAO TODO TRABALHO EM ALTURA ESTA PROIBIDO.", retornar=True,
+          ia=["Essa regra nao existe assim.",
+              "O que vale e a condicao definida para esta atividade. Consulte o planejamento."],
+          registro=(CAT["MUD"], "PRECISA_MELHORAR")),
+      esc("C", "E SO UMA GARUA. CONTINUAR SEM VERIFICAR.",
+          ia=["A condicao mudou e nao foi verificada.",
+              "Quando a condicao muda, verifique o que foi planejado antes de continuar."],
+          registro=(CAT["MUD"], "PRECISA_MELHORAR"))],
+    regra_tecnica="Regra 5: nunca ensinar um limite universal de vento ou chuva. O criterio e o definido para a atividade.",
+    proibido_ensinar="CHOVEU = TODO TRABALHO EM ALTURA E PROIBIDO"),
+
+ ev("EV17", "Alarme de emergencia da obra", "CAM_1P_EV17_Alarme", "EVENTO_ALARME",
+    peso=1, mostrar=["EV17_Sirene_Alarme_Pav04", "EV17_Sirenes_Canteiro", "NPC_EV17_Evacuacao_01",
+                     "NPC_EV17_Evacuacao_02", "NPC_EV17_Evacuacao_03"],
+    escolhas=[
+      esc("A", "SEGUIR O PROCEDIMENTO DE EMERGENCIA DA OBRA.", correta=True,
+          define={"PROCEDIMENTO_EMERGENCIA_CORRETO": "SIM"},
+          ia=["Correto.", "Durante uma emergencia, siga o procedimento definido para o local."],
+          registro=(CAT["EMG"], "CORRETO")),
+      esc("B", "TERMINAR O PARAFUSO PRIMEIRO.", retornar=True,
+          define={"PROCEDIMENTO_EMERGENCIA_CORRETO": "NAO"},
+          ia=["Durante uma emergencia, siga o procedimento definido para o local."],
+          registro=(CAT["EMG"], "PRECISA_MELHORAR")),
+      esc("C", "ESPERAR PARA VER SE ALGUEM CORRE.", retornar=True,
+          define={"PROCEDIMENTO_EMERGENCIA_CORRETO": "NAO"},
+          ia=["Durante uma emergencia, siga o procedimento definido para o local."],
+          registro=(CAT["EMG"], "PRECISA_MELHORAR"))]),
+]
+
+
+# ================================================================= CENA PRINCIPAL + CONSEQUENCIAS
+PRINCIPAL = {
+ "id": "PRINC", "titulo": "Cena principal - queda de ferramenta", "modo": "1P",
+ "camera": "CAM_1P_PRINC_Chave_Escapa", "maos": "MAOS_1P_PRINC_Mao_Solta_Chave",
+ "mostrar": ["PRINC_Chave_Escapando_1P", "MAOS_1P_PRINC_Mao_Solta_Chave"],
+ "obrigatoria": True,
+ "nota": "Independentemente dos eventos sorteados, esta consequencia permanece no treinamento.",
+ "ia": ["%s, a ferramenta escapou." % N],
+ "resultados": [
+   {"se": {"FERRAMENTAS_PROTEGIDAS": "SIM"},
+    "consequencia": c3p("CAM_3P_PRINC_Ferramenta_Retida",
+        mostrar=["AVATAR_PRINC_Chave_Escapou", "PRINC_Chave_Retida_Pelo_Cordao", "C20_Ferramentas_Protegidas"],
+        ocultar=["C20_Ferramentas_Soltas", "PRINC_Chave_Escapando_1P"],
+        ia=["%s, a ferramenta escapou." % N, "Mas a medida tomada antes impediu que ela caisse.",
+            "Uma decisao simples evitou uma situacao perigosa."]),
+    "registro": {"categoria": CAT["FERR"], "resultado": "CORRETO"}},
+   {"se": {"FERRAMENTAS_PROTEGIDAS": "NAO", "AREA_INFERIOR_ISOLADA": "SIM"},
+    "consequencia": c3p("CAM_3P_PRINC_Ferramenta_Area_Isolada",
+        mostrar=["C14_Area_Inferior_Isolada", "C14_Barreira_Oeste_Movel", "PRINC_Chave_Caida_Dentro_Area_Isolada"],
+        ocultar=["C14_Area_Inferior_Nao_Isolada", "PRINC_Chave_Escapando_1P"],
+        ia=["A ferramenta caiu.", "Ninguem estava abaixo por causa do isolamento.",
+            "Mas a queda ainda poderia ter sido evitada."]),
+    "registro": {"categoria": CAT["FERR"], "resultado": "PRECISA_MELHORAR"}},
+   {"se": {"FERRAMENTAS_PROTEGIDAS": "NAO", "AREA_INFERIOR_ISOLADA": "NAO"},
+    "erro_critico": True,
+    "consequencia": c3p("CAM_3P_PRINC_Ferramenta_Pessoa_Abaixo",
+        mostrar=["PRINC_Chave_Caindo_Congelada_Sobre_Pessoa", "NPC_PRINC_Trabalhador_Abaixo",
+                 "C14_Area_Inferior_Nao_Isolada"],
+        ocultar=["PRINC_Chave_Escapando_1P"], congelar=True,
+        tela={"linhas": ["AREA ABAIXO NAO ISOLADA", "+", "FERRAMENTA SEM PROTECAO", "=", "PESSOA EXPOSTA"]},
+        ia=["%s, observe." % N, "Essa situacao comecou antes da ferramenta cair.",
+            "Uma sequencia de decisoes criou uma situacao que poderia causar um acidente grave."],
+        nota="silencio total no momento do congelamento"),
+    "registro": {"categoria": CAT["ABX"], "resultado": "PRECISA_MELHORAR"}}],
+ "proxima": "CONC",
+}
+
+CONSEQUENCIAS = [
+ {"id": "CONSEQ_MATERIAL_SOLTO", "titulo": "Material solto", "se": {"MATERIAL_SOLTO": "SIM"},
+  "quando": "algum tempo depois da C15, de preferencia junto de uma rajada de vento",
+  "consequencia": c3p("CAM_3P_CONSEQ_Material_Solto",
+      mostrar=["CONSEQ_Material_Solto_Caindo_Congelado", "NPC_PRINC_Trabalhador_Abaixo"], congelar=True,
+      ia=["Lembra daquele material que parecia nao oferecer problema?", "Ele acabou de se mover."]),
+  "variantes": [
+    {"se": {"AREA_INFERIOR_ISOLADA": "SIM"}, "mostrar": ["CONSEQ_Material_Solto_No_Chao", "C14_Area_Inferior_Isolada"],
+     "ocultar": ["NPC_PRINC_Trabalhador_Abaixo"], "ia": ["Ninguem foi atingido por causa do isolamento."]},
+    {"se": {"AREA_INFERIOR_ISOLADA": "NAO"}, "mostrar": ["NPC_PRINC_Trabalhador_Abaixo"],
+     "ia": ["Uma pessoa ficou exposta."], "erro_critico": True}],
+  "registro": {"categoria": CAT["FERR"], "resultado": "PRECISA_MELHORAR"}},
+
+ {"id": "CONSEQ_MATERIAL_RETIRADO", "titulo": "Consequencia positiva - material retirado da borda",
+  "se": {"MATERIAL_SOLTO": "NAO"}, "positiva": True,
+  "quando": "quando o vento aumentar (EV06) ou perto da organizacao final",
+  "consequencia": c3p("CAM_3P_CONSEQ_Material_Retirado_Positivo",
+      mostrar=["EV06_Lona_Batendo_Poeira", "C15_Madeira_Retirada_Guardada"],
+      ocultar=["C17_Lona_Cobrindo_Material"],
+      ia=["%s, lembra do material que voce retirou daqui?" % N,
+          "Com esse vento, ele poderia ter sido deslocado."])},
+
+ {"id": "CONSEQ_ABERTURA_IGNORADA", "titulo": "Abertura ignorada", "se": {"ABERTURA_IGNORADA": "SIM"},
+  "quando": "durante o retorno, ao passar pelo 3o pavimento",
+  "consequencia": c3p("CAM_3P_C11_Conseq_Abertura_Ignorada",
+      mostrar=["NPC_CONSEQ_Pav03_Trabalhador_Carregando", "C11_Pav03_Abertura_Protecao_Deslocada"], congelar=True,
+      ia=["%s, lembra deste local?" % N, "Voce decidiu continuar porque nao era sua area.",
+          "Agora outro trabalhador esta exposto.",
+          "Um risco nao deixa de existir porque pertence ao servico de outra pessoa."]),
+  "registro": {"categoria": CAT["ABER"], "resultado": "PRECISA_MELHORAR"}, "erro_critico": True},
+
+ {"id": "CONSEQ_CONEXAO_INCORRETA", "titulo": "Conexao incorreta", "se": {"CONEXAO_INCORRETA": "SIM"},
+  "quando": "em uma situacao de desequilibrio, quando o sistema e exigido",
+  "consequencia": c3p("CAM_3P_CONSEQ_Conexao_Incorreta", congelar=True,
+      ia=["%s, voce acreditava estar protegido." % N,
+          "Mas o local escolhido nao fazia parte do sistema previsto.",
+          "Nao escolha um ponto porque ele parece forte.",
+          "Utilize o que foi definido para a atividade."]),
+  "variantes_por_ponto": {
+      "TUBULACAO": {"mostrar": ["AVATAR_CONSEQ_Conexao_Incorreta_Tubulacao", "CONSEQ_Conexao_Tubulacao_Cedendo"]},
+      "VERGALHAO": {"mostrar": ["AVATAR_CONSEQ_Conexao_Incorreta_Vergalhao", "CONSEQ_Conexao_Vergalhao_Dobrando"]},
+      "ESTRUTURA_METALICA": {"mostrar": ["AVATAR_CONSEQ_Conexao_Incorreta_EstruturaMetalica",
+                                          "CONSEQ_Conexao_Estrutura_Metalica_Deslizando"]},
+      "GUARDA_CORPO": {"camera": "CAM_3P_CONSEQ_Guarda_Corpo_Problema",
+                        "mostrar": ["AVATAR_CONSEQ_Conexao_Incorreta_GuardaCorpo", "CONSEQ_Conexao_GuardaCorpo_Cedendo"]}},
+  "registro": {"categoria": CAT["QUED"], "resultado": "PRECISA_MELHORAR"}, "erro_critico": True},
+
+ {"id": "CONSEQ_EQUIPAMENTO_DANIFICADO", "titulo": "Equipamento danificado",
+  "se_qualquer": [{"CINTURAO_DANIFICADO": "SIM"}, {"TALABARTE_DANIFICADO": "SIM"}],
+  "quando": "durante uma queda simulada, quando o equipamento e exigido",
+  "consequencia": c3p("CAM_3P_CONSEQ_Equipamento_Danificado", congelar=True,
+      ia=["Lembra do dano encontrado antes de subir?",
+          "O problema nao desapareceu quando voce decidiu continuar.",
+          "O equipamento esta sendo exigido justamente agora.",
+          "Equipamento danificado deve ser retirado de uso."]),
+  "variantes": [
+    {"se": {"CINTURAO_DANIFICADO": "SIM"}, "mostrar": ["AVATAR_CONSEQ_Cinturao_Danificado"]},
+    {"se": {"TALABARTE_DANIFICADO": "SIM"}, "mostrar": ["AVATAR_CONSEQ_Talabarte_Danificado"]}],
+  "registro": {"categoria": CAT["INSP"], "resultado": "PRECISA_MELHORAR"}, "erro_critico": True},
+
+ {"id": "CONSEQ_GUARDA_CORPO_PROBLEMA", "titulo": "Guarda-corpo com problema nao comunicado",
+  "se": {"GUARDA_CORPO_PROBLEMA": "SIM"}, "quando": "quando o jogador se apoiar ou encostar no trecho solto",
+  "consequencia": c3p("CAM_3P_CONSEQ_Guarda_Corpo_Problema",
+      mostrar=["CONSEQ_GcR_Sul05a_Cedendo", "C13_GcR_Sul05a_Levemente_Solto"],
+      ocultar=["TorreA_Pav04_GcR_Sul_05a"], congelar=True,
+      ia=["Aquele trecho que parecia estar de pe cedeu.",
+          "Uma protecao nao precisa estar caida para apresentar um problema."]),
+  "registro": {"categoria": CAT["ABER"], "resultado": "PRECISA_MELHORAR"}, "erro_critico": True},
+
+ {"id": "CONSEQ_COMUNICACAO_RESTABELECIDA", "titulo": "Consequencia positiva - comunicacao restabelecida",
+  "se": {"COMUNICACAO_FUNCIONANDO": "SIM"}, "positiva": True, "requer_evento": "EVENTO_RADIO",
+  "quando": "quando surgir uma situacao que exija comunicacao",
+  "ia": ["Agora voce esta vendo por que restabelecer a comunicacao foi importante."]},
+
+ {"id": "CONSEQ_ISOLAMENTO_FUNCIONOU", "titulo": "Consequencia positiva - o isolamento funcionou",
+  "se": {"AREA_INFERIOR_ISOLADA": "SIM"}, "positiva": True,
+  "quando": "quando uma peca cair inesperadamente (PRINC ou EV02)",
+  "ia": ["O isolamento funcionou exatamente quando foi necessario."]},
+]
+
+
+# ================================================================= FECHAMENTO
+FECHAMENTO = [
+ cena("CONC", "Conclusao da tarefa", "CAM_1P_CONC_Suporte_Instalado",
+   maos="MAOS_1P_C21_Chave",
+   mostrar=["CONC_Suporte_Instalado", "MAOS_1P_C21_Chave"], ocultar=["C21_Suporte_Aguardando"],
+   ia=["%s, servico concluido." % N,
+       "Mas terminar a tarefa nao significa simplesmente pegar suas coisas e ir embora.",
+       "Deixe a area segura para quem vier depois."],
+   proxima="ORG"),
+
+ cena("ORG", "Organizacao final", "CAM_1P_ORG_Organizacao_Final",
+   mostrar=["ORG_Sobras_Ferramentas_Apos_Servico", "CONC_Suporte_Instalado"],
+   gatilho="TRG_ORG_Saida_Frente",
+   lista_verificacao=["recolher ferramentas", "retirar materiais", "conferir se nada ficou proximo a borda",
+                      "verificar o caminho de saida", "observar as protecoes", "comunicar a conclusao"],
+   escolhas=[
+     esc("A", "RECOLHER TUDO E COMUNICAR A CONCLUSAO.", correta=True,
+         mostrar=["AVATAR_ORG_Recolhendo_Ferramentas"], ocultar=["ORG_Sobras_Ferramentas_Apos_Servico"],
+         ia=["Boa.", "A area fica segura para quem vier depois."], registro=(CAT["OBS"], "CORRETO")),
+     esc("B", "SAIR DEIXANDO O MATERIAL.", retornar=True,
+         ia=["Observe novamente.", "Seu servico terminou.",
+             "O risco que voce deixar aqui continuara para outra pessoa."],
+         registro=(CAT["OBS"], "PRECISA_MELHORAR"))],
+   proxima="RET"),
+
+ cena("RET", "Retorno", "CAM_1P_RET_Descendo_Escada",
+   rota="R08_Retorno_Terreo", gatilho="TRG_RET_Terreo_Saida",
+   cameras_extra=["CAM_1P_RET_Chegada_Terreo"],
+   ia=["O trabalhador retorna pelo acesso previsto e desce ate o terreo."],
+   consequencias_pendentes=["CONSEQ_ABERTURA_IGNORADA"],
+   proxima="EMERG"),
+
+ cena("EMERG", "Ultima situacao - emergencia", "CAM_1P_EMERG_Trabalhador_Suspenso",
+   maos="MAOS_1P_EMERG_Radio",
+   mostrar=["NPC_EMERG_Trabalhador_Suspenso", "EMERG_Ancoragem_Kit_Isolamento_Resgate"],
+   gatilho="TRG_EMERG_Observacao", som="alarme",
+   ia=["%s, um trabalhador sofreu uma queda." % N, "Ele esta suspenso.", "O que voce faz?"],
+   escolhas=[
+     esc("A", "ACIONAR O PROCEDIMENTO DE EMERGENCIA E A EQUIPE PREPARADA PARA O RESGATE.", correta=True,
+         define={"PROCEDIMENTO_EMERGENCIA_CORRETO": "SIM"}, mostrar=["MAOS_1P_EMERG_Radio"],
+         falas=[{"quem": "TRABALHADOR", "texto": "Emergencia em trabalho em altura."},
+                {"quem": "TRABALHADOR", "texto": "Trabalhador suspenso."},
+                {"quem": "TRABALHADOR", "texto": "Acionando procedimento de emergencia."}],
+         conseq=c3p("CAM_3P_EMERG_A_Equipe_Resgate",
+                    mostrar=["NPC_EMERG_Trabalhador_Suspenso", "NPC_EMERG_Resgate_01_Borda",
+                             "NPC_EMERG_Resgate_02_Radio", "NPC_EMERG_Resgate_03_Chegando", "AVATAR_EMERG_A_Radio"],
+                    ia=["Correto.", "Um resgate em altura tambem possui riscos.",
+                        "Ele precisa seguir o procedimento definido.",
+                        "O objetivo e ajudar a vitima sem criar uma segunda vitima."]),
+         registro=(CAT["EMG"], "CORRETO")),
+     esc("B", "SUBIR SOZINHO PARA TENTAR PUXA-LO.", retornar=True,
+         define={"PROCEDIMENTO_EMERGENCIA_CORRETO": "NAO"},
+         conseq=c3p("CAM_3P_EMERG_B_Subir_Sozinho",
+                    mostrar=["NPC_EMERG_Trabalhador_Suspenso", "AVATAR_EMERG_B_Subindo_Escada"], congelar=True,
+                    ia=["Pare, %s." % N, "Entrar sem preparo pode transformar voce em outra vitima."]),
+         registro=(CAT["EMG"], "PRECISA_MELHORAR"), critica=True),
+     esc("C", "PEDIR PARA QUALQUER PESSOA AJUDAR.", retornar=True,
+         define={"PROCEDIMENTO_EMERGENCIA_CORRETO": "NAO"},
+         conseq=c3p("CAM_3P_EMERG_C_Qualquer_Pessoa",
+                    mostrar=["NPC_EMERG_Trabalhador_Suspenso", "NPC_EMERG_C_Pessoa_Nao_Preparada"],
+                    ia=["Nem todo trabalhador esta preparado para executar um resgate em altura."]),
+         registro=(CAT["EMG"], "PRECISA_MELHORAR")),
+     esc("D", "APENAS CHAMAR UMA AMBULANCIA.", retornar=True,
+         define={"PROCEDIMENTO_EMERGENCIA_CORRETO": "NAO"},
+         conseq=c3p("CAM_3P_EMERG_D_Aguardando", mostrar=["NPC_EMERG_Trabalhador_Suspenso"],
+                    ia=["O atendimento medico pode ser necessario.",
+                        "Mas o trabalhador esta suspenso e existe um procedimento preparado para essa situacao.",
+                        "Acione a resposta prevista."]),
+         registro=(CAT["EMG"], "PRECISA_MELHORAR"))],
+   proxima="RELATORIO"),
+]
+
+
+# ================================================================= variaveis, sorteio, relatorio, resultados
+VARIAVEIS = [
+ ("TRABALHADOR_AUTORIZADO", "C02"), ("DOCUMENTACAO_VERIFICADA", "C04"), ("ACESSO_CORRETO", "C09"),
+ ("ABERTURA_IGNORADA", "C11"), ("CAPACETE_DANIFICADO", "C06a"), ("CINTURAO_DANIFICADO", "C06b"),
+ ("TALABARTE_DANIFICADO", "C06c"), ("CINTURAO_AJUSTADO", "C07"), ("GUARDA_CORPO_PROBLEMA", "C13"),
+ ("AREA_INFERIOR_ISOLADA", "C14"), ("MATERIAL_SOLTO", "C15"), ("INTERFERENCIA_EQUIPE", "C16/EV04"),
+ ("CONEXAO_INCORRETA", "C18"), ("FERRAMENTAS_PROTEGIDAS", "C20"), ("COMUNICACAO_FUNCIONANDO", "EV05"),
+ ("CONDICAO_AMBIENTAL_SEGURA", "C17/EV06/EV16"), ("PROCEDIMENTO_EMERGENCIA_CORRETO", "EV17/EMERG"),
+]
+
+SORTEIO = {
+ "quantidade_por_sessao": [3, 5],
+ "intervalo_minimo_entre_eventos_s": 45,
+ "regra": "o jogador precisa voltar a sentir que a situacao esta normal antes de surgir outro problema",
+ "obrigatorio_sempre": ["PRINC"],
+ "nao_sortear_juntos": [
+   ["EVENTO_VENTO", "EVENTO_CHUVA"],
+   ["EVENTO_ALARME", "EVENTO_MAL_ESTAR"],
+   ["EVENTO_OBJETO_SUPERIOR", "EVENTO_IMPACTO_PROTECAO"],
+   ["EVENTO_GUARDA_CORPO_REMOVIDO", "EVENTO_PROTECAO_ALTERADA"]],
+ "maximo_eventos_criticos_por_sessao": 2,
+ "condicionais": {"EVENTO_INVASAO_AREA_ISOLADA": {"AREA_INFERIOR_ISOLADA": "SIM"}},
+ "exemplos_de_execucao": [
+   ["EVENTO_RADIO", "EVENTO_INVASAO_AREA_ISOLADA", "EVENTO_VENTO", "EVENTO_GUARDA_CORPO_REMOVIDO"],
+   ["EVENTO_OBJETO_SUPERIOR", "EVENTO_MAL_ESTAR", "EVENTO_MOVIMENTACAO_CARGA", "EVENTO_PROTECAO_ALTERADA"],
+   ["EVENTO_IDENTIFICACAO_INDISPONIVEL", "EVENTO_FERRAMENTA_DEFEITUOSA", "EVENTO_SEGUNDO_TRABALHADOR", "EVENTO_ALARME"]],
+ "proporcao": "momentos normais + algumas decisoes importantes + poucos eventos inesperados + consequencias das escolhas",
+}
+
+RELATORIO = {
+ "cabecalho": ["TRABALHADOR", N],
+ "escala": ["CORRETO", "PRECISA_MELHORAR"],
+ "categorias": [CAT["AUT"], CAT["PLAN"], CAT["INSP"], CAT["ACES"], CAT["OBS"], CAT["ABER"], CAT["QUED"],
+                CAT["FERR"], CAT["ABX"], CAT["INES"], CAT["MUD"], CAT["COM"], CAT["EMG"]],
+ "regra": "nao mostrar somente uma nota - mostrar comportamento por categoria",
+}
+
+RESULTADOS = [
+ {"id": "BOM_DESEMPENHO", "condicao": "nenhum erro critico e no maximo 2 categorias em PRECISA_MELHORAR",
+  "ia": ["Parabens, %s." % N, "Voce concluiu a atividade tomando boas decisoes.",
+         "Mas o mais importante nao foi decorar respostas.",
+         "Foi perceber quando alguma coisa deixou de estar certa.", "Uma obra muda o tempo todo.",
+         "Observe.", "Pense.", "Nao improvise.",
+         "E quando alguma condicao deixar de ser segura, pare e comunique."]},
+ {"id": "PONTOS_A_MELHORAR", "condicao": "nenhum erro critico e 3 ou mais categorias em PRECISA_MELHORAR",
+  "ia": ["%s, voce concluiu o servico, mas algumas decisoes precisam ser revistas." % N,
+         "Observe o que aconteceu depois de cada escolha.",
+         "Em alguns casos, o problema apareceu varios minutos depois.",
+         "E exatamente por isso que precisamos pensar antes de agir."],
+  "botoes": ["REVISAR MINHAS DECISOES"]},
+ {"id": "ERROS_CRITICOS", "condicao": "pelo menos uma escolha marcada como erro_critico",
+  "ia": ["%s, algumas decisoes poderiam causar um acidente grave." % N,
+         "Antes de concluir o treinamento, voce devera repetir essas situacoes.",
+         "Nao tente apenas escolher outra resposta.",
+         "Observe o ambiente e entenda por que aquela decisao nao era segura."],
+  "botoes": ["REFAZER SITUACOES CRITICAS"]},
+]
+
+FINAL = {
+ "ia": ["%s, chegamos ao final da atividade." % N, "Hoje nem tudo aconteceu como planejado.",
+        "E essa e justamente uma das principais licoes.", "Uma obra muda.", "Pessoas circulam.",
+        "Materiais mudam de lugar.", "Outras equipes comecam servicos.", "O tempo pode mudar.",
+        "Um equipamento pode apresentar problema.", "Uma protecao pode ser alterada.",
+        "Voce nao controla tudo o que acontece ao seu redor.", "Mas pode controlar a forma como reage.",
+        "Observe.", "Pense antes de agir.", "Nao improvise.",
+        "Proteja voce e tambem quem trabalha ao seu redor.",
+        "E quando alguma coisa deixar de estar segura, pare e comunique.",
+        "Seguranca nao e trabalhar devagar.",
+        "E trabalhar sabendo quando continuar e quando parar.",
+        "Parabens por concluir o treinamento."],
+ "tela": {"titulo": "TREINAMENTO CONCLUIDO", "campos": [["TRABALHADOR", N]],
+          "botoes": ["VER MEU RESULTADO", "VER MINHAS DECISOES", "REVISAR SITUACOES DE RISCO",
+                     "REFAZER SITUACOES CRITICAS", "REFAZER TREINAMENTO", "FINALIZAR"]},
+}
+
+REGRAS_TECNICAS = [
+ "Nao ensinar o trabalhador a projetar um sistema de protecao contra quedas.",
+ "O sistema utilizado no cenario deve ser previamente definido.",
+ "Nao tratar tubulacao, vergalhao ou guarda-corpo como ponto de ancoragem por padrao.",
+ "Nao ensinar medidas universais de ajuste de equipamentos quando dependem do fabricante.",
+ "Nao inventar um limite universal de vento ou chuva.",
+ "As condicoes que exigem interrupcao devem estar definidas para o cenario.",
+ "Nao apresentar qualquer escada encontrada na obra como meio adequado de acesso.",
+ "Protecoes coletivas nao devem ser retiradas ou alteradas pelo jogador como improvisacao.",
+ "Aberturas no piso devem aparecer devidamente protegidas quando corretas.",
+ "Nao permitir que a ausencia de acidente transforme uma escolha insegura em escolha correta.",
+ "Um 'quase acidente' tambem deve gerar reflexao quando revelar uma condicao perigosa.",
+ "Se uma situacao nao estiver prevista ou tiver mudado de forma relevante, a resposta padrao nao deve ser "
+ "'improvise'; deve envolver interromper, comunicar e reavaliar.",
+ "Trabalhos simultaneos precisam ser considerados quando um puder interferir no outro.",
+ "O risco de queda de materiais e ferramentas deve fazer parte do cenario.",
+ "Emergencia e resgate devem existir no planejamento antes da atividade.",
+ "O jogador nao deve ser ensinado a executar sozinho um resgate especializado apenas porque viu uma animacao.",
+ "Pessoas responsaveis e capacitadas devem executar as acoes especificas que exigem essa qualificacao.",
+]
+
+LINGUAGEM = {
+ "principio": "linguagem simples; termo tecnico so quando faz parte do trabalho, explicado na primeira vez",
+ "glossario": [
+   ["ANALISE DE RISCO", "E a avaliacao feita antes do servico para identificar o que pode dar errado e como trabalhar com seguranca."],
+   ["PERMISSAO DE TRABALHO", "E a liberacao utilizada para determinadas atividades antes do inicio do servico."],
+   ["PONTO DE ANCORAGEM", "E um ponto previsto para fazer parte do sistema de protecao contra quedas."]],
+ "uso_do_nome": {"variavel": N,
+                 "usar_em": ["comeco de uma nova etapa", "antes de uma decisao importante", "depois de um erro",
+                             "durante uma consequencia", "em uma emergencia", "no resultado final"],
+                 "evitar": "repetir o nome em todas as frases"},
+ "falas_naturais": ["O, %s, da licenca aqui que eu preciso passar." % N, "E rapidinho.", "So falta um.",
+                    "Eu sempre faco desse jeito.", "Depois a gente arruma.", "Segura ai para mim."],
+ "a_ia_nunca_deve": ["ridicularizar trabalhadores", "tratar acidente como piada", "humilhar quem errou",
+                     "falar como personagem de desenho", "exagerar sotaques",
+                     "estereotipar o trabalhador da construcao"],
+ "pensamentos_a_combater": ["E rapidinho.", "Nunca aconteceu nada.", "Eu sempre fiz assim.", "So falta um.",
+                            "Isso aguenta.", "Depois a gente arruma.", "Nao e problema meu.", "Eu seguro bem.",
+                            "E so passar por baixo.", "Nao precisa parar por causa disso."],
+}
+
+
+# ================================================================= montagem
+def montar():
+    return {
+      "versao": "1.0",
+      "titulo": "Treinamento Interativo - Trabalho em Altura",
+      "cenario_principal": "Canteiro de obras",
+      "arquivo_3d": {"glb": "canteiro_trabalho_altura.glb", "glb_comprimido": "canteiro_trabalho_altura_draco.glb",
+                     "raiz_treinamento": "TREINAMENTO_TRABALHO_ALTURA",
+                     "unidades": "metros", "eixo_cima": "Y (glTF)", "origem": "portao de pedestres do canteiro"},
+      "camera": {
+        "padrao": "1a pessoa (CAM_1P_*)",
+        "terceira_pessoa": "somente para mostrar a consequencia de uma escolha (CAM_3P_*) e na Cena 07",
+        "lente_1p_mm": 20.0, "sensor_mm": 36.0, "fov_horizontal_graus": 84.0,
+        "altura_olhos_m": 1.62, "altura_olhos_ajoelhado_m": 1.0,
+        "maos_1p": "objetos MAOS_1P_* parentados na camera correspondente (espaco local da camera)",
+        "retorno": "toda cena 3P termina voltando para a 1a pessoa"},
+      "visibilidade": {
+        "propriedade": "userData.visivel_inicial",
+        "estado_inicial": "percorrer todos os objetos com visivel_inicial e aplicar o valor",
+        "durante_o_roteiro": "aplicar as listas 'mostrar' e 'ocultar' de cada cena/escolha/consequencia",
+        "observacao": "objetos com visivel_inicial=false estao no .glb, apenas desligados"},
+      "linguagem": LINGUAGEM,
+      "variaveis": [{"nome": v, "valores": ["SIM", "NAO"], "definida_em": onde} for v, onde in VARIAVEIS],
+      "variavel_extra": [{"nome": "PONTO_ESCOLHIDO",
+                          "valores": ["PA_04_01", "GUARDA_CORPO", "VERGALHAO", "TUBULACAO", "ESTRUTURA_METALICA"],
+                          "definida_em": "C18"}],
+      "cenas": CENAS,
+      "eventos_inesperados": EVENTOS,
+      "sorteio_de_eventos": SORTEIO,
+      "cena_principal": PRINCIPAL,
+      "consequencias": CONSEQUENCIAS,
+      "fechamento": FECHAMENTO,
+      "relatorio": RELATORIO,
+      "resultados": RESULTADOS,
+      "final": FINAL,
+      "regras_tecnicas": REGRAS_TECNICAS,
+      "principios": [
+        "Nao transformar o treinamento em pegadinha: toda decisao precisa ter informacao suficiente no cenario.",
+        "Nem tudo no cenario representa um risco - o trabalhador precisa realmente observar.",
+        "Mostrar tambem as consequencias positivas das boas decisoes.",
+        "Nao exagerar: a maior parte da atividade deve acontecer normalmente.",
+        "Ao repetir o treinamento, os eventos nao devem acontecer sempre na mesma ordem.",
+        "Escolha -> consequencia -> motivo."],
+    }
+
+
+if __name__ == "__main__":
+    import sys
+    dados = acentos.aplicar(montar())
+    saida = sys.argv[1] if len(sys.argv) > 1 else "roteiro_treinamento.json"
+    with open(saida, "w", encoding="utf-8") as f:
+        json.dump(dados, f, ensure_ascii=False, indent=1)
+    print("ok:", saida, os.path.getsize(saida), "bytes",
+          "| cenas:", len(dados["cenas"]), "| eventos:", len(dados["eventos_inesperados"]),
+          "| consequencias:", len(dados["consequencias"]))
